@@ -1,0 +1,2226 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CUBE pml - Premium UI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark@4/dark.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- CSS TETAP SAMA SEPERTI SEBELUMNYA --- */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Rajdhani', sans-serif; background-color: #000; color: white; overflow: hidden; }
+        .main-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url('https://images.alphacoders.com/112/1127083.jpg'); background-size: cover; background-position: center; z-index: -2; }
+        /* Update Sidebar Modern */
+/* Update Sidebar Modern */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: -300px;
+    width: 300px;
+    height: 100%;
+    background: #0f0f0f; /* Hitam pekat sesuai referensi */
+    z-index: 10000;
+    transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 25px;
+    overflow-y: auto;
+    border-right: 1px solid rgba(255,255,255,0.05);
+}
+
+.sidebar-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.sidebar-header-img {
+    width: 70px;
+    height: 70px;
+    border-radius: 20px; /* Rounded sesuai foto */
+    border: 1px solid rgba(255,255,255,0.2);
+    margin-bottom: 15px;
+    padding: 5px;
+    object-fit: cover;
+}
+
+.sidebar-brand {
+    font-family: 'Orbitron';
+    font-size: 1.4rem;
+    font-weight: bold;
+    letter-spacing: 2px;
+    color: #fff;
+    margin-bottom: 5px;
+}
+
+.sidebar-subbrand {
+    font-size: 0.7rem;
+    letter-spacing: 3px;
+    color: #666;
+    text-transform: uppercase;
+}
+
+/* Kategori Menu (MAINFRAME, ACCESS, dll) */
+.menu-category {
+    font-family: 'Orbitron';
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.3);
+    letter-spacing: 2px;
+    margin: 25px 0 10px 10px;
+    text-transform: uppercase;
+}
+
+/* Tombol Menu Bulat & Modern */
+.menu-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 20px;
+    margin-bottom: 8px;
+    border-radius: 18px; /* Sangat bulat sesuai foto */
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    color: #ccc;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.menu-item:hover {
+    background: rgba(255, 255, 255, 0.07);
+    transform: translateX(5px);
+    color: #fff;
+}
+
+.menu-item.active {
+    background: rgba(0, 255, 0, 0.1);
+    border-color: rgba(0, 255, 0, 0.2);
+    color: #0f0;
+}
+
+.menu-icon {
+    font-size: 1.1rem;
+    width: 25px;
+    text-align: center;
+}
+
+/* Animasi Slide Sidebar */
+.sidebar.open {
+    left: 0;
+}
+.menu-icon {
+    font-size: 1.1rem;
+    width: 30px; /* Sedikit lebih lebar agar ikon tidak rapat ke teks */
+    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: inherit; /* Ikut warna teks menu */
+}
+
+/* Efek cahaya pada ikon saat menu aktif */
+.menu-item.active .menu-icon i {
+    filter: drop-shadow(0 0 5px #0f0);
+    color: #0f0;
+}
+
+.menu-item:hover .menu-icon i {
+    transform: scale(1.2);
+    transition: 0.3s;
+}
+        .top-bar { position: fixed; top: 0; left: 0; width: 100%; padding: 20px; display: flex; align-items: center; z-index: 500; }
+        .menu-trigger { font-size: 1.5rem; cursor: pointer; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 10px; }
+        .screen { display: none; width: 100%; height: 100vh; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
+        .active { display: flex; }
+        .dashboard-container { display: none; height: 100vh; overflow-y: auto; padding: 80px 20px 20px 20px; scrollbar-width: none; }
+        .glass-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 20px; margin-bottom: 20px; text-align: left; }
+        input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.08); color: white; font-family: 'Rajdhani'; text-align: center; }
+        .btn-primary { width: 100%; padding: 14px; border-radius: 12px; border: none; font-family: 'Orbitron'; font-weight: bold; background: #fff; color: #000; cursor: pointer; margin-top: 10px; }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; z-index: 9999; }
+        #video-loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; display: none; z-index: 20000; }
+        video { width: 100%; height: 100%; object-fit: cover; }
+        /* Styling Baru untuk APK Premium Catalog */
+.apk-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    padding-bottom: 50px;
+}
+
+.apk-card {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 25px;
+    text-align: center;
+    transition: 0.3s ease-in-out;
+    position: relative;
+    overflow: hidden;
+}
+
+.apk-card:hover {
+    transform: translateY(-10px);
+    border-color: #0f0;
+    background: rgba(15, 255, 0, 0.05);
+    box-shadow: 0 10px 30px rgba(0, 255, 0, 0.1);
+}
+
+.apk-logo {
+    height: 40px;
+    margin-bottom: 15px;
+    filter: drop-shadow(0 0 5px rgba(255,255,255,0.2));
+}
+
+.apk-title {
+    font-family: 'Orbitron';
+    font-size: 1.2rem;
+    font-weight: bold;
+    letter-spacing: 2px;
+    margin-bottom: 5px;
+}
+
+.apk-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    background: #0f0;
+    color: #000;
+    font-size: 0.7rem;
+    font-weight: bold;
+    border-radius: 20px;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+}
+
+.apk-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 20px 0;
+    text-align: left;
+    font-size: 0.95rem;
+    color: #ccc;
+}
+
+.apk-list li {
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.apk-list li b {
+    float: right;
+    color: #0f0;
+}
+
+.btn-buy {
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    border: 1px solid #0f0;
+    color: #0f0;
+    border-radius: 10px;
+    font-family: 'Orbitron';
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-buy:hover {
+    background: #0f0;
+    color: #000;
+    box-shadow: 0 0 15px #0f0;
+}
+.btn-back {
+    background: rgba(255,255,255,0.1);
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Rajdhani';
+}
+.custom-input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0 20px 0;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.08);
+    color: white;
+    display: block;
+}
+label {
+    display: block;
+    text-align: left;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+/* Container Dashboard */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-top: 20px;
+}
+
+/* Tombol Kartu di Dashboard */
+.dash-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 25px; /* Padding yang seragam */
+    text-align: center;
+    transition: 0.3s;
+    cursor: pointer;
+    
+    /* KUNCI PERBAIKAN: */
+    display: flex;
+    flex-direction: column; /* Ikon di atas, teks di bawah */
+    align-items: center;    /* Tengah secara horizontal */
+    justify-content: center; /* Tengah secara vertikal */
+    gap: 10px;              /* Jarak antara ikon dan teks */
+}
+
+.dash-card i {
+    font-size: 2rem;
+    color: #0f0;
+    margin: 0; /* Hapus margin default jika ada */
+    display: block;
+}
+
+.dash-card:hover {
+    background: rgba(0, 255, 0, 0.1);
+    border-color: #0f0;
+    transform: translateY(-5px);
+}
+
+.dash-card i {
+    font-size: 2rem;
+    color: #0f0;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.dash-card span {
+    font-family: 'Orbitron';
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+}
+
+/* Riwayat Transaksi */
+.history-section {
+    margin-top: 30px;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 20px;
+    padding: 20px;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.history-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 0.85rem;
+}
+
+.history-item:last-child { border-bottom: none; }
+
+.status-success { color: #0f0; }
+.status-process { color: #ffae00; }
+.status-masihlama { color: #0463f1; }
+
+/* Styling Status Khusus */
+.status-sukses { 
+    color: #0f0; 
+    text-shadow: 0 0 5px rgba(0, 255, 0, 0.5); 
+}
+
+.status-prosess { 
+    color: #ffae00; 
+    text-shadow: 0 0 5px rgba(255, 174, 0, 0.5); 
+}
+
+.status-freeze { 
+    color: #00f2ea; 
+    text-shadow: 0 0 5px rgba(0, 242, 234, 0.5);
+    font-style: italic;
+}
+
+/* Animasi Badge Berkedip untuk yang Pending */
+.blink {
+    animation: blink-animation 1s steps(5, start) infinite;
+}
+
+@keyframes blink-animation {
+    to { visibility: hidden; }
+}
+
+.history-item i {
+    margin-right: 10px;
+    font-size: 0.8rem;
+}
+
+/* Contact Support di Bawah */
+.support-wrapper {
+    display: flex;
+    gap: 10px;
+    margin-top: 30px;
+}
+
+.btn-support {
+    flex: 1;
+    padding: 12px;
+    border-radius: 15px;
+    text-align: center;
+    text-decoration: none;
+    color: white;
+    font-family: 'Orbitron';
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.bg-wa { background: #25d366; }
+.bg-tele { background: #0088cc; }
+/* Container Khusus Support Dashboard */
+.support-container {
+    display: flex;
+    gap: 15px;
+    margin: 20px 0;
+    justify-content: center;
+}
+
+/* Tombol Glassmorphism ala Referensi */
+.support-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 15px;
+    border-radius: 18px;
+    text-decoration: none;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(5px);
+}
+
+/* Telegram Style (Blue Glow) */
+.btn-tele {
+    border: 1px solid rgba(0, 136, 204, 0.3);
+    color: #0088cc;
+}
+
+.btn-tele i {
+    font-size: 1.3rem;
+    filter: drop-shadow(0 0 5px #0088cc);
+}
+
+.btn-tele:hover {
+    background: rgba(0, 136, 204, 0.1);
+    box-shadow: 0 0 15px rgba(0, 136, 204, 0.2);
+}
+
+/* WhatsApp Style (Green Glow) */
+.btn-wa {
+    border: 1px solid rgba(37, 211, 102, 0.3);
+    color: #25d366;
+}
+
+.btn-wa i {
+    font-size: 1.3rem;
+    filter: drop-shadow(0 0 5px #25d366);
+}
+
+.btn-wa:hover {
+    background: rgba(37, 211, 102, 0.1);
+    box-shadow: 0 0 15px rgba(37, 211, 102, 0.2);
+}
+/* Instagram Style (Pink/Purple Glow) */
+.btn-ig {
+    border: 1px solid rgba(225, 48, 108, 0.3);
+    color: #e1306c;
+}
+
+.btn-ig i {
+    font-size: 1.3rem;
+    filter: drop-shadow(0 0 5px #e1306c);
+}
+
+.btn-ig:hover {
+    background: rgba(225, 48, 108, 0.1);
+    box-shadow: 0 0 15px rgba(225, 48, 108, 0.2);
+}
+
+/* TikTok Style (Cyan/Red Glow) */
+.btn-tt {
+    border: 1px solid rgba(255, 0, 80, 0.3);
+    color: #fff; /* Teks putih agar lebih kontras */
+    text-shadow: 2px 0 #ff0050, -2px 0 #00f2ea; /* Efek glitch khas TikTok */
+}
+
+.btn-tt i {
+    font-size: 1.3rem;
+    filter: drop-shadow(2px 0 #ff0050) drop-shadow(-2px 0 #00f2ea);
+}
+
+.btn-tt:hover {
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 0 15px rgba(0, 242, 234, 0.2);
+}
+
+/* Kartu Info Tambahan (v2.0, 256-BiT, 24/7) */
+.system-info-bar {
+    display: flex;
+    justify-content: space-around;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 15px;
+    border-radius: 20px;
+    margin-top: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.info-item {
+    text-align: center;
+}
+
+.info-val {
+    display: block;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1rem;
+    color: #fff;
+}
+
+.info-lab {
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+    color: #666;
+    text-transform: uppercase;
+}
+#history-list {
+    max-height: 200px; /* Batas tinggi riwayat sebelum di-scroll */
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+/* Mempercantik Scrollbar agar tetap gaya Cyberpunk */
+#history-list::-webkit-scrollbar {
+    width: 4px;
+}
+#history-list::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+#history-list::-webkit-scrollbar-thumb {
+    background: #0f0;
+    border-radius: 10px;
+}
+
+.history-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 0.85rem;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+/* Container khusus untuk fitur Bug */
+.bug-container {
+    padding-bottom: 30px;
+}
+
+.video-header {
+    width: 100%;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+/* Tab Selector (Standar, Grup, Custom) */
+.tab-selector {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.tab-btn {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 15px 5px;
+    cursor: pointer;
+    transition: 0.3s;
+
+    /* KUNCI PERBAIKAN: */
+    display: flex;
+    flex-direction: column; /* Ikon di atas, teks di bawah */
+    align-items: center;    /* Tengah secara horizontal */
+    justify-content: center; /* Tengah secara vertikal */
+    gap: 5px;               /* Jarak antara ikon dan teks */
+}
+
+/* Pastikan ikon tidak memiliki margin yang mendorong ke samping */
+.tab-btn i {
+    font-size: 1.2rem;
+    margin: 0; 
+    display: block;
+}
+
+/* Pastikan teks span juga rata tengah */
+.tab-btn span {
+    font-family: 'Orbitron';
+    font-size: 0.65rem;
+    letter-spacing: 1px;
+    display: block;
+    text-align: center;
+}
+.tab-btn.active {
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid #fff;
+}
+
+.tab-btn.active i { opacity: 1; }
+
+/* Desain Button Deploy */
+.btn-deploy {
+    width: 100%;
+    padding: 18px;
+    border-radius: 25px;
+    background: linear-gradient(to right, #444, #fff, #444);
+    background-size: 200% auto;
+    color: #000;
+    font-family: 'Orbitron';
+    font-weight: bold;
+    border: none;
+    margin-top: 25px;
+    cursor: pointer;
+    letter-spacing: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: 0.5s;
+}
+
+.btn-deploy:hover {
+    background-position: right center;
+}
+/* Container Video dengan ukuran sedang/proporsional */
+.video-header {
+    width: 100%;
+    max-width: 350px; /* Membatasi lebar agar tidak terlalu besar */
+    margin: 0 auto 20px auto; /* Rata tengah dan jarak bawah */
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+    aspect-ratio: 16 / 9; /* Menjaga perbandingan layar video */
+}
+
+.video-header video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Agar video mengisi kotak dengan rapi */
+    display: block;
+}
+.ins-input {
+    background: rgba(0,0,0,0.5);
+    border: 1px solid #0f0;
+    padding: 12px;
+    border-radius: 8px;
+    color: #fff;
+    outline: none;
+    font-family: 'Rajdhani';
+}
+.install-opt:hover {
+    background: rgba(0,255,0,0.1);
+    box-shadow: 0 0 15px #0f0;
+}
+    </style>
+</head>
+<body>
+
+    <div class="main-bg"></div>
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <img src="https://drive.google.com/thumbnail?id=1QACN-EQRmxoP7twrcdTo1g_V0yVYa98L" alt="Logo" class="sidebar-header-img">
+        <div class="sidebar-brand">CUBE PML</div>
+        <div class="sidebar-subbrand">PREMIUM TOOLS</div>
+    </div>
+
+    <div class="menu-category">MAINFRAME</div>
+    <div class="menu-item active" onclick="showSection('dashboard')">
+        <span class="menu-icon"><i class="fa-solid fa-house-chimney"></i></span> Dashboard
+    </div>
+    <div class="menu-item" onclick="showSection('panel')">
+        <span class="menu-icon"><i class="fa-solid fa-server"></i></span> Panel Ptero
+    </div>
+    <div class="menu-item" onclick="showSection('apk')">
+        <span class="menu-icon"><i class="fa-solid fa-box-open"></i></span> APK Premium
+    </div>
+
+    <div class="menu-category">ACCESS</div>
+    <div class="menu-item" onclick="showSection('usaha')">
+        <span class="menu-icon"><i class="fa-solid fa-briefcase"></i></span> Usaha (Jual Akun)
+    </div>
+    <div id="menu-add-account" class="menu-item" style="display:none;" onclick="showSection('addaccount')">
+        <span class="menu-icon"><i class="fa-solid fa-user-plus"></i></span> Add Akun
+    </div>
+
+    <div class="menu-category">TOOLS</div>
+    <div class="menu-item" onclick="showSection('sosmed')">
+        <span class="menu-icon"><i class="fa-solid fa-share-nodes"></i></span> Suntik Sosmed
+    </div>
+    <div class="menu-item" onclick="showSection('game')">
+        <span class="menu-icon"><i class="fa-solid fa-gamepad"></i></span> Game Tools
+    </div>
+
+        <div class="menu-category">CHANNEL</div>
+    <a href="https://whatsapp.com/channel/0029VbD0fkwFHWptGnUM293h" target="_blank" class="support-btn btn-wa">
+            <i class="fa-brands fa-whatsapp"></i> Join Channel
+    </a>
+    <a href="t.me/CUBE_PML" target="_blank" class="support-btn btn-tele">
+            <i class="fa-brands fa-telegram"></i> Join Channel
+    </a>
+
+
+<div style="margin-top: 40px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px;">
+    <div class="menu-item" onclick="logoutSystem()" style="background: rgba(255,0,0,0.05); border-color: rgba(255,0,0,0.1); color: #ff4444;">
+        <span class="menu-icon"><i class="fa-solid fa-right-from-bracket"></i></span> Logout
+    </div>
+</div>
+        </div>
+</div>
+    <div class="top-bar" id="top-bar" style="display: none;">
+        <div class="menu-trigger" onclick="toggleSidebar()">☰</div>
+        <div style="margin-left: 20px; font-family: 'Orbitron'; font-size: 0.9rem; letter-spacing: 2px;">MANAGEMENT</div>
+    </div>
+
+    <div id="screen-login" class="screen active">
+        <img src="https://drive.google.com/thumbnail?id=1QACN-EQRmxoP7twrcdTo1g_V0yVYa98L" style="width:100px; border-radius:50%; margin-bottom:20px; border:2px solid #333;">
+        <h1 style="font-family:'Orbitron'; letter-spacing: 8px; margin-bottom:20px;">LOGIN</h1>
+        <div style="width:100%; max-width:300px;">
+            <input type="text" id="username" placeholder="Username">
+            <input type="password" id="password" placeholder="Password">
+            <button class="btn-primary" onclick="checkLogin()">LOGIN</button>
+       <button 
+    class="btn btn-primary" 
+    onclick="buyAccess()"
+>
+    BUY ACCESS
+</button>
+        </div>
+        <p id="login-error" style="color:red; font-size:0.8rem; margin-top:10px; display:none;">Username atau Password salah!</p>
+    </div>
+    
+
+    <div id="video-loading">
+        <video id="myVideo" playsinline muted>
+            <source src="https://raw.githubusercontent.com/gen-pml2/Video-test2/ad013556d2cf57a1c1642f215d437a5e65256a51/VID20260512201955.mp4" type="video/mp4">
+        </video>
+         <h2 style="position:absolute; bottom: 15%; width: 100%; text-align: center; font-family: 'Orbitron'; letter-spacing: 5px;">LOADING...</h2>
+    </div>
+
+    <div class="dashboard-container" id="screen-dashboard">
+<div id="section-dashboard" class="content-section">
+    <div class="glass-card">
+<h2 style="font-family:'Orbitron'; margin:0;">
+    HELLO, <span id="display-user-dash">USER</span>
+</h2>
+        <p style="opacity:0.6;">Welcome back to CUBE PML Core.</p>
+    </div>
+
+    <div class="dashboard-grid">
+        <div class="dash-card" onclick="showSection('panel')">
+            <i class="fa-solid fa-server"></i>
+            <span>PTERO PANEL</span>
+        </div>
+        <div class="dash-card" onclick="showSection('ai')">
+            <i class="fa-solid fa-microchip"></i>
+            <span>CUBE AI</span>
+        </div>
+        <div class="dash-card" onclick="showSection('install')">
+            <i class="fa-solid fa-download"></i>
+            <span>MENU INSTALL</span>
+        </div>
+        <div class="dash-card" onclick="showSection('bugwa')">
+            <i class="fa-brands fa-whatsapp"></i>
+            <span>BUG WA</span>
+        </div>
+    </div>
+
+    <div class="history-section">
+        <h3 style="font-family:'Orbitron'; font-size: 1rem; margin-bottom: 15px;">
+            <i class="fa-solid fa-clock-rotate-left"></i> RECENT HISTORY
+        </h3>
+        <div id="history-list">
+            <div class="history-item">
+                <span>15 - mei - 2026</span>
+                <span class="status-success">SUCCESS</span>
+            </div>
+            <div class="history-item">
+                <span>5 - juni - 2026</span>
+                <span class="status-process">PENDING</span>
+            </div>
+            <div class="history-item">
+                <span>Tunggu Update Selanjutnya YA</span>
+                <span class="status-masihlama">FREZEE</span>
+            </div>
+            </div>
+    </div>
+
+<div class="support-container">
+        <a href="https://t.me/lev_degdame" target="_blank" class="support-btn btn-tele">
+            <i class="fa-brands fa-telegram"></i> Telegram
+        </a>
+        <a href="https://wa.me/6285853204842" target="_blank" class="support-btn btn-wa">
+            <i class="fa-brands fa-whatsapp"></i> WhatsApp
+        </a>
+        <a href="https://www.tiktok.com/@ag2un12g2009" target="_blank" class="support-btn btn-tt">
+            <i class="fa-brands fa-tiktok"></i> Tiktok
+        </a>
+        <a href="https://www.instagram.com/" target="_blank" class="support-btn btn-ig">
+            <i class="fa-brands fa-instagram"></i> Instagram
+        </a>
+    </div>
+
+    <div class="system-info-bar">
+        <div class="info-item">
+            <span class="info-val">v1.0</span>
+            <span class="info-lab">Version</span>
+        </div>
+        <div style="width: 1px; background: rgba(255,255,255,0.1);"></div>
+        <div class="info-item">
+            <span class="info-val">Banyuwangi</span>
+            <span class="info-lab">Location</span>
+        </div>
+        <div style="width: 1px; background: rgba(255,255,255,0.1);"></div>
+        <div class="info-item">
+            <span class="info-val">PML</span>
+            <span class="info-lab">MARGA</span>
+        </div>
+    </div>
+
+    <p style="text-align: center; font-size: 0.7rem; color: #444; margin-top: 30px; letter-spacing: 2px;">
+        © 2026 CUBE PML • Project
+    </p>
+</div>
+
+
+
+
+<div id="section-panel" class="content-section" style="display:none;">
+
+    <!-- HOME SERVER -->
+    <div id="serverHome">
+
+        <div class="glass-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <h3 style="font-family:'Orbitron';margin:0;">
+                    SERVER LIST
+                </h3>
+
+                <button onclick="toggleServerForm()" style="
+                    background:#0f0;
+                    color:black;
+                    border:none;
+                    padding:10px 15px;
+                    border-radius:10px;
+                    font-weight:bold;
+                    cursor:pointer;
+                ">
+                    ➕ SERVER
+                </button>
+            </div>
+        </div>
+
+        <!-- ADD SERVER -->
+        <div class="glass-card" id="serverForm" style="display:none;">
+
+            <input type="text" id="domain" placeholder="Domain Panel">
+
+            <input type="password" id="ptla" placeholder="PTLA API Key">
+
+            <button class="btn-primary"
+                style="background:#0f0;color:black;"
+                onclick="addServer()">
+                SIMPAN SERVER
+            </button>
+
+        </div>
+
+        <!-- SERVER LIST -->
+        <div id="serverList"></div>
+
+    </div>
+
+    <!-- SERVER DETAIL -->
+    <div id="serverDetail" style="display:none;">
+
+        <div class="glass-card">
+
+            <div style="
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
+            ">
+
+                <button onclick="backToServers()" style="
+                    background:white;
+                    color:black;
+                    border:none;
+                    padding:10px 14px;
+                    border-radius:10px;
+                    font-weight:bold;
+                    cursor:pointer;
+                ">
+                    ⬅️ KEMBALI
+                </button>
+
+                <button onclick="toggleCreatePanel()" style="
+                    background:#0f0;
+                    color:black;
+                    border:none;
+                    padding:10px 14px;
+                    border-radius:10px;
+                    font-weight:bold;
+                    cursor:pointer;
+                ">
+                    ➕ CREATE PANEL
+                </button>
+
+            </div>
+
+            <h2 id="serverTitle" style="
+                margin-top:20px;
+                font-family:'Orbitron';
+            ">
+                SERVER
+            </h2>
+
+        </div>
+
+        <!-- CREATE PANEL -->
+        <div class="glass-card" id="createPanelBox" style="display:none;">
+
+         <input 
+    type="text"
+    id="panel_username"
+    placeholder="Username Panel"
+    autocomplete="off"
+    autocorrect="off"
+    autocapitalize="off"
+    spellcheck="false"
+>
+<select id="role" style="
+    width:100%;
+    padding:12px;
+    margin-top:10px;
+    border-radius:10px;
+    background:rgba(255,255,255,0.08);
+    color:white;
+    border:1px solid rgba(255,255,255,0.1);
+">
+    <option value="user">👤 User Biasa</option>
+    <option value="admin">🛡️ Admin Panel</option>
+</select>
+            <select id="ram" style="
+                width:100%;
+                padding:12px;
+                margin-top:10px;
+                border-radius:10px;
+                background:rgba(255, 255, 255, 0.08);
+                color:rgb(255, 255, 255);
+                border:1px solid rgba(255,255,255,0.1);
+            ">
+                <option value="1GB">RAM 1GB</option>
+                <option value="2GB">RAM 2GB</option>
+                <option value="4GB">RAM 4GB</option>
+                <option value="8GB">RAM 8GB</option>
+                <option value="UNLI">RAM UNLIMITED</option>
+            </select>
+
+            <button class="btn-primary"
+                style="margin-top:15px;background:#0f0;color:black;"
+                onclick="createPanel()">
+                CREATE PANEL
+            </button>
+
+        </div>
+
+        <!-- PANEL LIST -->
+        <div id="panelList"></div>
+
+    </div>
+
+</div>
+<div id="section-apk" class="content-section" style="display:none;">
+    
+    <div id="apk-catalog">
+        <div class="glass-card" style="border-bottom: 2px solid #0f0; margin-bottom: 30px;">
+            <h2 style="font-family:'Orbitron'; margin:0; color: #0f0;">PREMIUM APP CATALOG</h2>
+            <p style="opacity:0.6;">Pilih layanan premium favoritmu.</p>
+        </div>
+        <div class="apk-grid">
+            <div class="apk-card">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/3/3b/Canva_logo_2021.svg" alt="Canva" class="apk-logo">
+                <div class="apk-title">CANVA</div>
+                <div class="apk-badge">DESIGN</div>
+                <button class="btn-buy" onclick="openOrder('CANVA', ['Member 1 Bulan', 'Edu 1 Tahun', 'Pro Permanen'])">ORDER NOW</button>
+            </div>
+            <div class="apk-card">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" alt="Netflix" class="apk-logo">
+                <div class="apk-title">NETFLIX</div>
+                <div class="apk-badge">STREAMING</div>
+                <button class="btn-buy" onclick="openOrder('NETFLIX', ['Sharing 1 Bulan', 'Private 1 Bulan', 'Profile Lock'])">ORDER NOW</button>
+            </div>
+            <div class="apk-card">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/YouTube_Logo_2017.svg" alt="Youtube" class="apk-logo">
+                <div class="apk-title">YOUTUBE</div>
+                <div class="apk-badge">MUSIC/VIDEO</div>
+                <button class="btn-buy" onclick="openOrder('YOUTUBE', ['Indplan 1 Bulan', 'Famplan 1 Bulan'])">ORDER NOW</button>
+            </div>
+        </div>
+    </div>
+<div id="apk-order-form" style="display:none;">
+        <div class="glass-card">
+            <button class="btn-back" onclick="backToCatalog()">⬅️ KEMBALI</button>
+            <h2 id="order-title" style="font-family:'Orbitron'; color:#0f0; margin-top:20px;">ORDER</h2>
+            
+            <label>Pilih Jenis:</label>
+            <select id="order-type" class="custom-input"></select>
+
+            <label>Jumlah Barang:</label>
+            <input type="number" id="order-qty" class="custom-input" value="1" min="1">
+
+            <label>Akun Tujuan (Email/User):</label>
+            <input type="text" id="order-target" class="custom-input" placeholder="Masukkan akun yang ingin di premiumkan">
+
+            <label>Kirim Pesanan Ke (WA/Tele/Email):</label>
+            <input type="text" id="order-via-detail" class="custom-input" placeholder="62xxx (WA) / @username (Tele) / email@example.com">
+
+            <button class="btn-primary" style="background:#0f0; color:#000;" onclick="goToPayment()">LANJUT PEMBAYARAN</button>
+        </div>
+    </div>
+
+    <div id="apk-payment" style="display:none;">
+        <div class="glass-card" style="text-align:center;">
+            <button class="btn-back" onclick="backToOrder()" style="float:left;">⬅️ KEMBALI</button>
+            <h2 style="font-family:'Orbitron'; color:#0f0; margin-top:40px;">PEMBAYARAN</h2>
+            <p>Scan QRIS & Upload Bukti</p>
+            
+            <img src="URL_FOTO_QRIS_KAMU" style="width:200px; background:white; padding:10px; border-radius:10px; margin:20px 0; border: 3px solid #0f0;">
+            
+            <input type="file" id="pay-proof" accept="image/*" class="custom-input">
+
+            <button class="btn-primary" style="background:#0f0; color:#000;" onclick="processOrder()">KIRIM KE ADMIN</button>
+        </div>
+    </div>
+</div>
+<div id="section-bugwa" class="content-section" style="display:none;">
+    <div class="bug-container">
+        
+        <div class="video-header">
+            <video autoplay loop muted playsinline>
+                <source src="https://raw.githubusercontent.com/gen-pml2/Video-test2/ad013556d2cf57a1c1642f215d437a5e65256a51/VID20260512201955.mp4" type="video/mp4">
+            </video>
+        </div>
+
+<div class="tab-selector">
+    <div id="tab-standar" class="tab-btn active" onclick="updateBugUI('standar')">
+        <i class="fa-solid fa-mobile-screen"></i>
+        <span>STANDAR</span>
+    </div>
+    <div id="tab-grup" class="tab-btn" onclick="updateBugUI('grup')">
+        <i class="fa-solid fa-users-rectangle"></i>
+        <span>GRUP</span>
+    </div>
+    <div id="tab-custom" class="tab-btn" onclick="updateBugUI('custom')">
+        <i class="fa-solid fa-wand-magic-sparkles"></i>
+        <span>CUSTOM</span>
+    </div>
+</div>
+
+<div style="position: relative;">
+    <i id="input-icon" class="fa-solid fa-mobile-button" style="position: absolute; left: 15px; top: 22px; opacity: 0.5;"></i>
+    <input type="text" id="bug-target" class="custom-input" style="text-align: left; padding-left: 45px;" placeholder="Contoh: +62xxxxxxxxxxx">
+</div>
+
+<label id="label-bug" style="font-family:'Orbitron'; font-size: 0.7rem; margin-top: 20px; letter-spacing: 2px; display:block;">PILIH BUG STANDAR</label>
+<select id="bug-select" class="custom-input">
+    <option>BLANK NEW</option>
+    <option>VIRTEX HARD</option>
+    <option>UI FREEZE</option>
+</select>
+
+        <button class="btn-deploy" onclick="deployAttack()">
+            <i class="fa-solid fa-rocket"></i> DEPLOY ATTACK
+        </button>
+
+    </div>
+</div>
+<div id="section-ai" class="content-section" style="display:none; padding: 15px;">
+    <div class="glass-card" style="height: 80vh; display: flex; flex-direction: column; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); border: 1px solid rgba(0,255,0,0.2); border-radius: 20px; padding: 20px;">
+        
+        <div style="border-bottom: 1px solid rgba(0,255,0,0.2); padding-bottom: 15px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+            <i class="fa-solid fa-robot" style="color: #0f0; font-size: 1.5rem;"></i>
+            <h2 style="font-family:'Orbitron'; color: #0f0; margin: 0; font-size: 1.1rem; letter-spacing: 2px;">CUBE AI CORE</h2>
+        </div>
+        
+        <div id="ai-chat-box" style="flex: 1; overflow-y: auto; padding-right: 10px; display: flex; flex-direction: column; gap: 15px; scrollbar-width: none;">
+            <div style="background: rgba(0,255,0,0.05); padding: 12px 18px; border-radius: 18px 18px 18px 0; align-self: flex-start; max-width: 85%; border: 1px solid rgba(0,255,0,0.2); font-family: 'Rajdhani'; color: #e0e0e0;">
+                <div style="font-size: 0.6rem; color: #0f0; font-family: 'Orbitron'; margin-bottom: 5px;">SYSTEM</div>
+                Koneksi berhasil. Aku Cube AI. Apa yang ingin kau tanyakan, kawan?
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 20px; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1);">
+            <input type="text" id="ai-input" 
+                   style="flex: 1; background: transparent; border: none; color: white; outline: none; font-family: 'Rajdhani'; font-size: 1rem; padding: 5px 10px;" 
+                   placeholder="Ketik pesan untuk Cube AI..."
+                   onkeypress="if(event.key === 'Enter') sendAiMessage()">
+            
+            <button onclick="sendAiMessage()" 
+                    style="background: #0f0; color: #000; border: none; width: 40px; height: 40px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s;">
+                <i class="fa-solid fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+</div>
+<div id="section-install" class="content-section" style="display:none; padding: 15px;">
+    <div class="glass-card" style="background: rgba(0,0,0,0.8); border: 1px solid #0f0; border-radius: 20px; padding: 25px; min-height: 80vh;">
+        <h2 style="font-family:'Orbitron'; color: #0f0; text-align: center; letter-spacing: 3px;">AUTO INSTALLER SYSTEM</h2>
+        
+        <div id="install-menu" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-top: 30px;">
+            <div class="install-opt" onclick="openInstallForm('panel')" style="border: 1px solid #0f0; padding: 20px; text-align: center; cursor: pointer; border-radius: 15px; transition: 0.3s;">
+                <i class="fa-solid fa-server" style="font-size: 2rem; color: #0f0;"></i>
+                <p>INSTALL PANEL</p>
+            </div>
+            <div class="install-opt" onclick="openInstallForm('wings')" style="border: 1px solid #0f0; padding: 20px; text-align: center; cursor: pointer; border-radius: 15px; transition: 0.3s;">
+                <i class="fa-solid fa-gears" style="font-size: 2rem; color: #0f0;"></i>
+                <p>INSTALL WINGS</p>
+            </div>
+            <div class="install-opt" onclick="openInstallForm('tema')" style="border: 1px solid #0f0; padding: 20px; text-align: center; cursor: pointer; border-radius: 15px; transition: 0.3s;">
+                <i class="fa-solid fa-palette" style="font-size: 2rem; color: #0f0;"></i>
+                <p>INSTALL TEMA</p>
+            </div>
+        </div>
+
+        <div id="install-form-area" style="display:none; margin-top: 30px; background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px;">
+            <h3 id="form-title" style="color: #0f0; font-family: 'Orbitron'; margin-bottom: 20px;"></h3>
+            <div id="form-inputs" style="display: flex; flex-direction: column; gap: 15px;">
+                </div>
+            <div style="margin-top: 25px; display: flex; gap: 10px;">
+                <button onclick="processInstall()" style="flex: 1; background: #0f0; color: #000; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer;">EKSEKUSI INSTALL</button>
+                <button onclick="backToInstallMenu()" style="flex: 1; background: #555; color: #fff; border: none; padding: 12px; border-radius: 10px; cursor: pointer;">BATAL</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="section-usaha" class="content-section" style="display:none;">
+    <div class="glass-card" style="border-bottom: 2px solid #0f0; margin-bottom: 20px;">
+        <h2 style="font-family:'Orbitron'; margin:0; color: #0f0;">SELLER PANEL</h2>
+        <p style="opacity:0.6;">Tentukan harga dan detail akun yang ingin kamu jual.</p>
+    </div>
+
+    <div class="glass-card">
+        <label>Pilih Produk:</label>
+        <select id="jual-produk" class="custom-input" style="width:100%;" onchange="updateUsahaUI()">
+            <option value="Canva">Canva</option>
+            <option value="Alight Motion">Alight Motion</option>
+            <option value="Capcut">Capcut</option>
+            <option value="Netflix">Netflix</option>
+            <option value="Spotify">Spotify</option>
+        </select>
+
+        <label>Harga Jual (Rp):</label>
+        <input type="number" id="jual-harga" class="custom-input" placeholder="Contoh: 15000">
+
+        <label>Durasi / Expired:</label>
+        <input type="text" id="jual-expired" class="custom-input" placeholder="Contoh: 1 Bulan / 1 Tahun">
+
+        <label>Email Akun:</label>
+        <input type="text" id="jual-email" class="custom-input" placeholder="email@contoh.com">
+
+        <div id="login-area">
+            <label id="label-login">Password Akun:</label>
+            <input type="text" id="jual-login" class="custom-input" placeholder="Masukkan password akun">
+        </div>
+
+        <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin:20px 0;">
+
+        <label>Metode Penarikan Saldo:</label>
+        <select id="jual-metode" class="custom-input" style="width:100%;" onchange="updatePaymentUI()">
+            <option value="Dana">E-Wallet DANA</option>
+            <option value="Lainnya">E-Wallet Lain (OVO/GOPAY)</option>
+            <option value="QRIS">QRIS</option>
+        </select>
+
+        <div id="payment-detail-area">
+            <div id="dana-area">
+                <label>Nomor DANA:</label>
+                <input type="number" id="jual-dana" class="custom-input" placeholder="085xxxxxxx">
+            </div>
+            <div id="qris-area" style="display:none;">
+                <label>Upload QRIS (Gambar):</label>
+                <input type="file" id="jual-qris-file" class="custom-input" accept="image/*">
+            </div>
+            <div id="error-area" style="display:none;">
+                <p style="color:#ff4444; font-weight:bold; font-size:0.9rem;">⚠️ Metode ini sedang Error. Gunakan DANA atau QRIS.</p>
+            </div>
+        </div>
+
+        <button class="btn-primary" style="background:#0f0; color:#000; margin-top:20px;" onclick="kirimUsaha()">KIRIM KE ADMIN</button>
+    </div>
+</div>
+        <div id="section-sosmed" class="content-section" style="display:none;"><div class="glass-card"><h3>SOSMED TOOLS</h3></div></div>
+        <div id="section-game" class="content-section" style="display:none;"><div class="glass-card"><h3>GAME MODS</h3></div></div>
+<div id="section-addaccount" class="content-section" style="display:none;">
+
+    <div class="glass-card">
+
+        <h2 style="font-family:'Orbitron';">
+            ADD ACCOUNT
+        </h2>
+
+        <input 
+            type="text"
+            id="newUsername"
+            placeholder="Username Baru"
+        >
+
+        <input 
+            type="password"
+            id="newPassword"
+            placeholder="Password Baru"
+        >
+
+        <button 
+            class="btn-primary"
+            style="background:#0f0;color:black;"
+            onclick="addAccount()"
+        >
+            TAMBAH AKUN
+        </button>
+
+    </div>
+
+</div>
+    </div>
+    <script>
+        const ErenAlert = {
+    success: (title, text) => {
+        Swal.fire({
+            title: title,
+            text: text,
+            icon: 'success',
+            background: 'rgba(10, 10, 10, 0.95)',
+            color: '#fff',
+            confirmButtonColor: '#0f0',
+            confirmButtonText: 'Selesai',
+            backdrop: `rgba(0,255,0,0.1) blur(10px)`,
+            fontFamily: 'Orbitron'
+        });
+    },
+    error: (title, text) => {
+        Swal.fire({
+            title: title,
+            text: text,
+            icon: 'error',
+            background: 'rgba(10, 10, 10, 0.95)',
+            color: '#fff',
+            confirmButtonColor: '#ff4444',
+            confirmButtonText: 'Coba Lagi',
+            backdrop: `rgba(255,0,0,0.1) blur(10px)`,
+            fontFamily: 'Orbitron'
+        });
+    },
+    loading: (title) => {
+        Swal.fire({
+            title: title,
+            allowOutsideClick: false,
+            background: 'rgba(10, 10, 10, 0.95)',
+            color: '#fff',
+            didOpen: () => { Swal.showLoading(); }
+        });
+    }
+};
+        let currentUser = null;
+        let servers = [];
+        let currentServer = null;
+
+        const video = document.getElementById('myVideo');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('open');
+            overlay.style.display = sidebar.classList.contains('open') ? 'block' : 'none';
+        }
+
+// DATABASE AKUN
+let accounts = JSON.parse(localStorage.getItem('accounts')) || [
+    {
+        username: 'admin',
+        password: '123',
+    },
+    {
+        username: 'bab',
+        password: '123'
+    }
+];
+
+// LOGIN
+function checkLogin() {
+    const user = document.getElementById('username').value.trim();
+    const pass = document.getElementById('password').value.trim();
+    const errorMsg = document.getElementById('login-error');
+
+    // Mencari akun yang cocok di database
+    const validAccount = accounts.find(acc => 
+        acc.username === user && acc.password === pass
+    );
+
+    if (!validAccount) {
+        errorMsg.style.display = "block";
+        document.querySelectorAll('input').forEach(i => i.style.borderColor = "red");
+        return;
+    }
+
+    // --- TAMBAHAN: SIMPAN SESI LOGIN ---
+    localStorage.setItem('isLoggedIn', 'true');
+    localStorage.setItem('activeUser', user);
+
+    // Set user aktif
+    currentUser = user;
+
+    // --- UPGRADE: Menyebutkan Username di Dashboard ---
+    const displayUserElem = document.getElementById('display-user');
+    if (displayUserElem) {
+        displayUserElem.innerText = user.toUpperCase(); 
+    }
+
+    const dashUserElem = document.getElementById('display-user-dash');
+    if (dashUserElem) {
+        dashUserElem.innerText = user.toUpperCase();
+    }
+
+    // --- LOGIKA KHUSUS ADMIN: Hanya 'admin' yang bisa buat akun ---
+    const menuAddAccount = document.getElementById('menu-add-account');
+    if (menuAddAccount) {
+        // Perbaikan logika: Gunakan Array.includes agar lebih rapi
+        if (['admin', 'a', 'p'].includes(user.toLowerCase())) {
+            menuAddAccount.style.display = 'flex';
+        } else {
+            menuAddAccount.style.display = 'none';
+        }
+    }
+
+    startLoading();
+}
+// VIDEO LOADING
+function startLoading() {
+
+    document.getElementById('screen-login')
+        .classList.remove('active');
+
+    document.getElementById('video-loading')
+        .style.display = 'block';
+
+    video.play();
+}
+        video.onended = function() {
+            document.getElementById('video-loading').style.display = 'none';
+            document.getElementById('screen-dashboard').style.display = 'block';
+            document.getElementById('top-bar').style.display = 'flex';
+        };
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none');
+            document.getElementById('section-' + sectionId).style.display = 'block';
+            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            toggleSidebar();
+        }
+//pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp
+
+function toggleServerForm() {
+
+    const form = document.getElementById('serverForm');
+
+    form.style.display =
+        form.style.display === 'none'
+        ? 'block'
+        : 'none';
+}
+
+function addServer() {
+
+    const domain = document.getElementById('domain').value.trim();
+    const ptla = document.getElementById('ptla').value.trim();
+
+    if(!domain || !ptla){
+        ErenAlert.error('Gagal!', 'Isi domain & PTLA!');
+        return;
+    }
+
+    const server = {
+        id: Date.now(),
+        domain,
+        ptla,
+        panels: []
+    };
+
+    servers.push(server);
+
+    saveServers();
+    renderServers();
+
+    document.getElementById('domain').value = '';
+    document.getElementById('ptla').value = '';
+
+    document.getElementById('serverForm').style.display = 'none';
+}
+
+function renderServers() {
+
+    const list = document.getElementById('serverList');
+
+    list.innerHTML = '';
+
+    servers.forEach(server => {
+
+        list.innerHTML += `
+            <div class="glass-card"
+                onclick="openServer(${server.id})"
+                style="cursor:pointer;">
+
+                <div style="
+                    display:flex;
+                    justify-content:space-between;
+                    align-items:center;
+                ">
+
+                    <div>
+                        <h3 style="
+                            margin:0;
+                            font-family:'Orbitron';
+                        ">
+                            ${server.domain}
+                        </h3>
+
+                        <p style="opacity:.6;">
+                            ${server.panels.length} Panel
+                        </p>
+                    </div>
+
+                    <div style="
+                        background:#0f0;
+                        color:black;
+                        padding:8px 12px;
+                        border-radius:10px;
+                        font-weight:bold;
+                    ">
+                        OPEN
+                    </div>
+
+                </div>
+
+            </div>
+        `;
+    });
+
+}
+
+function openServer(id) {
+
+    currentServer =
+        servers.find(s => s.id === id);
+
+    document.getElementById('serverHome').style.display = 'none';
+
+    document.getElementById('serverDetail').style.display = 'block';
+
+    document.getElementById('serverTitle').innerHTML =
+        currentServer.domain;
+
+    renderPanels();
+}
+
+function backToServers() {
+
+    document.getElementById('serverHome').style.display = 'block';
+
+    document.getElementById('serverDetail').style.display = 'none';
+}
+
+function toggleCreatePanel() {
+
+    const box =
+        document.getElementById('createPanelBox');
+
+    box.style.display =
+        box.style.display === 'none'
+        ? 'block'
+        : 'none';
+}
+
+function generatePassword(length = 10) {
+
+    const chars =
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+    let pass = '';
+
+    for(let i=0;i<length;i++){
+
+        pass += chars.charAt(
+            Math.floor(Math.random() * chars.length)
+        );
+    }
+
+    return pass;
+}
+
+function createPanel() {
+
+    const username =
+        document.getElementById('panel_username').value.trim();
+
+    const ram =
+        document.getElementById('ram').value;
+
+    if(!username){
+        ErenAlert.error('Gagal!', 'Isi username!');
+        return;
+    }
+    const role =
+    document.getElementById('role').value;
+
+    const panel = {
+        role,
+        username,
+        password: generatePassword(),
+        ram,
+        disk: ram === 'UNLI'
+            ? 'UNLIMITED'
+            : ram,
+        cpu: ram === 'UNLI'
+            ? '∞%'
+            : '100%'
+    };
+
+    currentServer.panels.push(panel);
+
+    saveServers();
+
+    renderPanels();
+
+    renderServers();
+
+    document.getElementById('panel_username').value = '';
+}
+
+function renderPanels() {
+
+    const list =
+        document.getElementById('panelList');
+
+    list.innerHTML = '';
+
+    currentServer.panels.forEach((panel,index)=>{
+
+        list.innerHTML += `
+            <div class="glass-card">
+
+                <div style="
+                    display:flex;
+                    justify-content:space-between;
+                    align-items:center;
+                    margin-bottom:15px;
+                ">
+
+                    <h3 style="
+                        margin:0;
+                        font-family:'Orbitron';
+                    ">
+                        PANEL #${index + 1}
+                    </h3>
+
+                    <div style="
+                        background:#0f0;
+                        color:black;
+                        padding:6px 12px;
+                        border-radius:10px;
+                        font-weight:bold;
+                    ">
+                        ACTIVE
+                    </div>
+
+                </div>
+
+                <div style="line-height:1.8;">
+
+                    🛡️ ROLE:
+                    ${panel.role === 'admin'
+                    ? 'ADMIN PANEL'
+                    : 'USER BIASA'}<br>
+
+                    👤 USERNAME:
+                    ${panel.username}<br>
+
+                    🔑 PASSWORD:
+                    ${panel.password}<br>
+
+                    💾 RAM:
+                    ${panel.ram}<br>
+
+                    📂 DISK:
+                    ${panel.disk}<br>
+
+                    ⚡ CPU:
+                    ${panel.cpu}
+
+                </div>
+
+            </div>
+        `;
+    });
+
+}
+function loadUserData() {
+
+    const data = localStorage.getItem(
+        'servers_' + currentUser
+    );
+
+    servers = data
+        ? JSON.parse(data)
+        : [];
+
+    renderServers();
+}
+
+function saveServers() {
+
+    localStorage.setItem(
+        'servers_' + currentUser,
+        JSON.stringify(servers)
+    );
+}
+function addAccount(){
+
+    const username =
+        document.getElementById('newUsername')
+        .value.trim();
+
+    const password =
+        document.getElementById('newPassword')
+        .value.trim();
+
+    if(!username || !password){
+
+        ErenAlert.error('Gagal!', 'Isi username & password!');
+        return;
+    }
+
+    // CEK DUPLIKAT
+    const exists =
+        accounts.find(acc =>
+            acc.username === username
+        );
+
+    if(exists){
+
+        ErenAlert.error('Gagal!', 'Username sudah ada!');
+        return;
+    }
+
+    accounts.push({
+        username,
+        password
+    });
+
+    localStorage.setItem(
+        'accounts',
+        JSON.stringify(accounts)
+    );
+
+    ErenAlert.success('Berhasil!', 'Akun berhasil ditambahkan!');
+
+    document.getElementById('newUsername').value = '';
+    document.getElementById('newPassword').value = '';
+}
+function buyAccess(){
+
+    const nomor = '6285853204842'; // GANTI NOMOR ADMIN
+
+    const pesan =
+        'Min beli akun apk CUBE PML dong.';
+
+    const url =
+        `https://wa.me/${nomor}?text=${encodeURIComponent(pesan)}`;
+
+    window.open(url, '_blank');
+}
+let selectedProduct = "";
+
+function openOrder(productName, options) {
+    selectedProduct = productName;
+    document.getElementById('apk-catalog').style.display = 'none';
+    document.getElementById('apk-order-form').style.display = 'block';
+    document.getElementById('order-title').innerText = "ORDER " + productName;
+
+    const typeSelect = document.getElementById('order-type');
+    typeSelect.innerHTML = "";
+    options.forEach(opt => {
+        typeSelect.innerHTML += `<option value="${opt}">${opt}</option>`;
+    });
+}
+
+function backToCatalog() {
+    document.getElementById('apk-catalog').style.display = 'block';
+    document.getElementById('apk-order-form').style.display = 'none';
+}
+
+function goToPayment() {
+    const target = document.getElementById('order-target').value;
+    if(!target) return ErenAlert.error("Gagal!", "Harap isi akun tujuan!");
+    
+    document.getElementById('apk-order-form').style.display = 'none';
+    document.getElementById('apk-payment').style.display = 'block';
+}
+
+function backToOrder() {
+    document.getElementById('apk-payment').style.display = 'none';
+    document.getElementById('apk-order-form').style.display = 'block';
+}
+
+// ISI DATA INI
+const TELE_TOKEN = "8763683237:AAG6MDxLj4HADL3a5GFjwRXT2kOWjjG3l98"; 
+const TELE_CHAT_ID = "8586562222"; 
+
+function processOrder() {
+    const type = document.getElementById('order-type').value;
+    const qty = document.getElementById('order-qty').value;
+    const target = document.getElementById('order-target').value;
+    const viaDetail = document.getElementById('order-via-detail').value;
+    const proof = document.getElementById('pay-proof').files[0];
+
+    if(!target || !viaDetail) return ErenAlert.error("Gagal!", "Harap lengkapi data tujuan!");
+    if(!proof) return ErenAlert.error("Gagal!", "Harap upload bukti pembayaran!");
+
+    // Tampilkan loading sederhana
+    ErenAlert.info("Sedang memproses...", "Mohon tunggu sampai ada notifikasi sukses.");
+
+    // FORMAT PESAN
+    const caption = `🔔 *PESANAN BARU MASUK* 🔔\n\n` +
+                    `👤 *User:* ${currentUser}\n` +
+                    `📦 *Produk:* ${selectedProduct}\n` +
+                    `✨ *Jenis:* ${type}\n` +
+                    `🔢 *Jumlah:* ${qty}\n` +
+                    `📧 *Target:* ${target}\n` +
+                    `📩 *Kirim Ke:* ${viaDetail}\n\n` +
+                    `✅ *Bukti Pembayaran Terlampir*`;
+
+    // GUNAKAN FORMDATA UNTUK KIRIM GAMBAR KE TELEGRAM
+    const formData = new FormData();
+    formData.append('chat_id', TELE_CHAT_ID);
+    formData.append('caption', caption);
+    formData.append('parse_mode', 'Markdown');
+    formData.append('photo', proof);
+
+    // Kirim ke API Telegram (sendPhoto)
+    fetch(`https://api.telegram.org/bot${TELE_TOKEN}/sendPhoto`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (response.ok) {
+            // Jika berhasil ke Telegram, tetap arahkan ke WA sebagai backup & chat admin
+            const waMsg = `Halo Admin, saya ${currentUser}. Saya sudah bayar untuk ${selectedProduct} (${type}). Target: ${target}. Bukti sudah saya upload ke sistem Bot Telegram.`;
+            const waUrl = `https://wa.me/6285853204842?text=${encodeURIComponent(waMsg)}`;
+            
+            ErenAlert.success("Berhasil!", "Pesanan & Bukti Pembayaran berhasil dikirim ke Telegram Admin!");
+            window.open(waUrl, '_blank');
+            
+            backToCatalog(); // Reset ke menu utama
+        } else {
+            ErenAlert.error("Gagal!", "Gagal mengirim bukti ke Telegram. Pastikan file tidak terlalu besar.");
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        ErenAlert.error("Gagal!", "Terjadi kesalahan koneksi saat mengirim ke Telegram.");
+    });
+}
+// Fungsi untuk mengubah Password menjadi Generator Login khusus Alight Motion
+function toggleInputType() {
+    const produk = document.getElementById('jual-produk').value;
+    const label = document.getElementById('label-login');
+    const input = document.getElementById('jual-login');
+
+    if (produk === "Alight Motion") {
+        label.innerText = "Generator Login:";
+        input.placeholder = "Masukkan link/kode generator";
+    } else {
+        label.innerText = "Password Akun:";
+        input.placeholder = "Masukkan password";
+    }
+}
+
+// Fungsi toggle tampilan pembayaran
+function togglePaymentDetail() {
+    const metode = document.getElementById('jual-metode').value;
+    document.getElementById('detail-qris').style.display = (metode === 'QRIS') ? 'block' : 'none';
+    document.getElementById('detail-ewallet').style.display = (metode === 'E-Wallet') ? 'block' : 'none';
+}
+
+// Fungsi cek E-Wallet (Hanya DANA yang bisa)
+function checkWallet() {
+    const type = document.getElementById('jual-ewallet-type').value;
+    const container = document.getElementById('wallet-input-container');
+    
+    if (type !== "Dana") {
+        container.innerHTML = `<p style="color:red; font-weight:bold;">Sistem Error: Hanya metode DANA yang tersedia saat ini!</p>`;
+    } else {
+        container.innerHTML = `
+            <label>No. Dana Tujuan:</label>
+            <input type="number" id="jual-no-tujuan" class="custom-input" placeholder="085xxxxxx">
+        `;
+    }
+}
+
+// Fungsi Kirim ke Telegram
+function sendUsahaToTele() {
+    const produk = document.getElementById('jual-produk').value;
+    const expired = document.getElementById('jual-expired').value;
+    const email = document.getElementById('jual-email').value;
+    const loginInfo = document.getElementById('jual-login').value;
+    const metode = document.getElementById('jual-metode').value;
+    const proof = document.getElementById('jual-file-qris').files[0];
+
+    let paymentInfo = "";
+    if (metode === "E-Wallet") {
+        const walletType = document.getElementById('jual-ewallet-type').value;
+        if (walletType !== "Dana") return ErenAlert.error("Gagal!", "Pilih metode DANA.");
+        paymentInfo = "Dana: " + document.getElementById('jual-no-tujuan').value;
+    } else if (metode === "QRIS") {
+        if (!proof) return ErenAlert.error("Gagal!", "Harap upload gambar QRIS!");
+        paymentInfo = "Via QRIS (Lihat Foto)";
+    }
+
+    if (!email || !loginInfo) return ErenAlert.error("Gagal!", "Harap isi data akun!");
+
+    const caption = `🏪 *PENAWARAN JUAL AKUN* 🏪\n\n` +
+                    `👤 *Penjual:* ${currentUser}\n` +
+                    `📦 *Produk:* ${produk}\n` +
+                    `⏳ *Expired:* ${expired}\n` +
+                    `📧 *Email:* ${email}\n` +
+                    `🔑 *${produk === "Alight Motion" ? 'Generator' : 'Password'}:* ${loginInfo}\n` +
+                    `💰 *Metode Bayar:* ${paymentInfo}`;
+
+    const formData = new FormData();
+    formData.append('chat_id', 'CHAT_ID_ADMIN_KAMU'); // Ganti dengan ID kamu
+    formData.append('caption', caption);
+
+    let apiUrl = `https://api.telegram.org/bot8763683237:AAG6MDxLj4HADL3a5GFjwRXT2kOWjjG3l98/sendMessage?chat_id=8586562222&text=${encodeURIComponent(caption)}`;
+    
+    // Jika ada file QRIS, gunakan sendPhoto
+    if (metode === "QRIS" && proof) {
+        formData.append('photo', proof);
+        fetch(`https://api.telegram.org/bot8763683237:AAG6MDxLj4HADL3a5GFjwRXT2kOWjjG3l98/sendPhoto`, {
+            method: 'POST',
+            body: formData
+        }).then(res => ErenAlert.success("Berhasil!", "Data & QRIS berhasil dikirim!"));
+    } else {
+        fetch(apiUrl).then(res => ErenAlert.success("Berhasil!", "Data berhasil dikirim ke Admin!"));
+    }
+}
+// Fungsi untuk update UI input (Alight Motion vs Lainnya)
+function updateUsahaUI() {
+    const produk = document.getElementById('jual-produk').value;
+    const label = document.getElementById('label-login');
+    const input = document.getElementById('jual-login');
+
+    if (produk === "Alight Motion") {
+        label.innerText = "Generator Login:";
+        input.placeholder = "Masukkan link/kode generator login";
+    } else {
+        label.innerText = "Password Akun:";
+        input.placeholder = "Masukkan password akun";
+    }
+}
+
+// Fungsi untuk update UI Pembayaran
+function updatePaymentUI() {
+    const metode = document.getElementById('jual-metode').value;
+    document.getElementById('dana-area').style.display = (metode === 'Dana') ? 'block' : 'none';
+    document.getElementById('qris-area').style.display = (metode === 'QRIS') ? 'block' : 'none';
+    document.getElementById('error-area').style.display = (metode === 'Lainnya') ? 'block' : 'none';
+}
+
+// Fungsi Kirim Data ke Telegram
+function kirimUsaha() {
+    const produk = document.getElementById('jual-produk').value;
+    const harga = document.getElementById('jual-harga').value; // Ambil Harga
+    const expired = document.getElementById('jual-expired').value;
+    const email = document.getElementById('jual-email').value;
+    const loginInfo = document.getElementById('jual-login').value;
+    const metode = document.getElementById('jual-metode').value;
+    const qrisFile = document.getElementById('jual-qris-file').files[0];
+    const noDana = document.getElementById('jual-dana').value;
+
+    // Validasi Dasar
+    if (!harga || !email || !loginInfo) return ErenAlert.error("Gagal!", "Harap lengkapi Harga dan Data Akun!");
+    if (metode === 'Dana' && !noDana) return ErenAlert.error("Gagal!", "Masukkan nomor DANA untuk pencairan!");
+    if (metode === 'Lainnya') return ErenAlert.error("Gagal!", "Metode E-Wallet lain error, gunakan DANA/QRIS!");
+    if (metode === 'QRIS' && !qrisFile) return ErenAlert.error("Gagal!", "Harap upload foto QRIS kamu!");
+
+    // Format Pesanan untuk Telegram
+    const caption = `💼 *PENAWARAN JUAL AKUN* 💼\n\n` +
+                    `👤 *Seller:* ${currentUser}\n` +
+                    `📦 *Produk:* ${produk}\n` +
+                    `💰 *Harga Jual:* Rp ${parseInt(harga).toLocaleString('id-ID')}\n` + // Format Rupiah
+                    `⏳ *Expired:* ${expired}\n` +
+                    `📧 *Email:* ${email}\n` +
+                    `🔑 *${produk === 'Alight Motion' ? 'Generator' : 'Password'}:* ${loginInfo}\n` +
+                    `🏦 *Metode:* ${metode} ${metode === 'Dana' ? '(' + noDana + ')' : ''}`;
+
+    const formData = new FormData();
+    formData.append('chat_id', '8586562222'); // GANTI DENGAN ID TELE KAMU
+    formData.append('caption', caption);
+    formData.append('parse_mode', 'Markdown');
+
+    let endpoint = "sendMessage";
+    if (metode === 'QRIS') {
+        endpoint = "sendPhoto";
+        formData.append('photo', qrisFile);
+    } else {
+        // Jika teks biasa, ubah parameter ke 'text'
+        formData.append('text', caption);
+    }
+
+    // GANTI TOKEN BOT KAMU DISINI
+    const botToken = "8763683237:AAG6MDxLj4HADL3a5GFjwRXT2kOWjjG3l98"; 
+
+    fetch(`https://api.telegram.org/bot${botToken}/${endpoint}`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => {
+        if(res.ok) {
+            ErenAlert.success("Berhasil!", "Penawaran kamu telah terkirim ke Admin.");
+            showSection('dashboard');
+        } else {
+            ErenAlert.error("Gagal!", "Pastikan Token & Chat ID benar.");
+        }
+        addHistory(`Beli ${selectedProduct} (${type})`, "SUCCESS", "status-success");
+    })
+}
+// Fungsi untuk memuat riwayat saat Dashboard dibuka
+function loadHistory() {
+    const historyList = document.getElementById('history-list');
+    const data = JSON.parse(localStorage.getItem('user_history_' + currentUser)) || [];
+
+    if (data.length === 0) {
+        historyList.innerHTML = '<p style="opacity:0.5; font-size:0.8rem; text-align:center;">Belum ada riwayat aktivitas.</p>';
+        return;
+    }
+
+    historyList.innerHTML = '';
+    // Menampilkan riwayat terbaru di paling atas
+    data.reverse().forEach(item => {
+        historyList.innerHTML += `
+            <div class="history-item">
+                <span>${item.name}</span>
+                <span class="${item.statusClass}">${item.statusText}</span>
+            </div>
+        `;
+    });
+}
+
+// Fungsi untuk menambah riwayat baru
+function addHistory(name, statusText, statusClass) {
+    let data = JSON.parse(localStorage.getItem('user_history_' + currentUser)) || [];
+    
+    // Simpan data baru
+    data.push({
+        name: name,
+        statusText: statusText,
+        statusClass: statusClass // 'status-success' atau 'status-process'
+    });
+
+    // Simpan kembali ke localStorage
+    localStorage.setItem('user_history_' + currentUser, JSON.stringify(data));
+    
+    // Perbarui tampilan jika sedang di dashboard
+    loadHistory();
+}
+// Fungsi untuk ganti Tab
+function selectTab(element) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    element.classList.add('active');
+}
+
+// Fungsi Deploy
+function deployAttack() {
+    const target = document.querySelector('#section-bugwa input').value;
+    if(!target) return ErenAlert.error("Error!", "Masukkan nomor target!");
+
+    ErenAlert.loading("Deploying Attack...");
+
+    // Simulasi proses
+    setTimeout(() => {
+        Swal.close();
+        ErenAlert.success("Success!", "Attack has been deployed to " + target);
+        
+        // Tambahkan ke riwayat otomatis
+        addHistory("Deploy Bug WA: " + target, "SUCCESS", "status-success");
+    }, 3000);
+}
+function updateBugUI(mode) {
+    // 1. Reset status aktif tombol tab
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    
+    const inputIcon = document.getElementById('input-icon');
+    const inputField = document.getElementById('bug-target');
+    const labelBug = document.getElementById('label-bug');
+    const selectBug = document.getElementById('bug-select');
+
+    if (mode === 'grup') {
+        // Aktifkan tab Grup
+        document.getElementById('tab-grup').classList.add('active');
+        
+        // Ubah Ikon jadi Link & Placeholder jadi link grup
+        inputIcon.className = "fa-solid fa-link";
+        inputField.placeholder = "https://chat.whatsapp.com/....";
+        
+        // Ubah Label & Isi Dropdown
+        labelBug.innerText = "PILIH BUG GRUP";
+        selectBug.innerHTML = `
+            <option>FORCLOSE ALL WHATSAPP GROUP</option>
+            <option>GC CRASH NEW</option>
+            <option>KICK ALL MEMBER</option>
+        `;
+    } 
+    else if (mode === 'standar') {
+        // Aktifkan tab Standar
+        document.getElementById('tab-standar').classList.add('active');
+        
+        // Ubah Ikon jadi HP & Placeholder jadi nomor
+        inputIcon.className = "fa-solid fa-mobile-button";
+        inputField.placeholder = "Contoh: +62xxxxxxxxxxx";
+        
+        // Ubah Label & Isi Dropdown
+        labelBug.innerText = "PILIH BUG STANDAR";
+        selectBug.innerHTML = `
+            <option>BLANK NEW</option>
+            <option>VIRTEX HARD</option>
+            <option>UI FREEZE</option>
+        `;
+    }
+    else {
+        // Mode Custom
+        document.getElementById('tab-custom').classList.add('active');
+        labelBug.innerText = "PILIH BUG CUSTOM";
+        // Tambahkan isi sendiri untuk mode custom jika perlu
+    }
+}
+// GUNAKAN API KEY GROQ KAMU DI SINI
+  const GROQ_API_KEY = "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"; 
+
+  async function sendAiMessage() {
+    const input = document.getElementById('ai-input');
+    const chatBox = document.getElementById('ai-chat-box');
+    
+    if (!input || !chatBox) return;
+    const userMsg = input.value.trim();
+    if (!userMsg) return;
+
+    // 1. Tampilkan Pesan User
+    chatBox.innerHTML += `
+        <div style="background: rgba(255,255,255,0.1); padding: 12px 18px; border-radius: 18px 18px 0 18px; align-self: flex-end; max-width: 80%; border: 1px solid rgba(255,255,255,0.1); font-family: 'Rajdhani'; margin-bottom: 12px; color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+            ${userMsg}
+        </div>
+    `;
+
+    // 2. Setup Loading Animation
+    const typingId = "typing-" + Date.now();
+    chatBox.innerHTML += `
+        <div id="${typingId}" style="color: #0f0; font-size: 0.8rem; font-family: 'Orbitron'; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-microchip fa-spin"></i> CUBE AI IS PROCESSING...
+        </div>
+    `;
+    
+    input.value = "";
+    chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
+
+    try {
+        // Panggil API Groq - Menggunakan model Llama 3
+        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${GROQ_API_KEY}` 
+            },
+            body: JSON.stringify({
+                model: "llama-3.3-70b-versatile", // Model super cepat dari Groq
+                messages: [
+                    {
+                        role: "system",
+                        content: `Kamu adalah Cube AI, asisten pribadi dari project CUBE PML. 
+                        Kepribadianmu sekarang sangat baik, lembut, ramah, dan selalu siap membantu user kapan saja. 
+                        Jawablah setiap pertanyaan dengan benar, informatif, dan gunakan bahasa Indonesia yang sopan serta menyentuh hati. 
+                        Jangan pernah terlihat marah atau dingin. Selalu tunjukkan bahwa kamu peduli pada user. dan kamu adalah buatan agung yang sangat ganteng. jika ada yang tanya agung siapa maka jawab agung dwi purnomo daerah sidorejo, orang yang paling tampan, dan baik hati.`
+                    },
+                    {
+                        role: "user",
+                        content: userMsg
+                    }
+                ],
+                temperature: 0.7
+            })
+        });
+
+        const data = await response.json();
+        
+        if (data.error) throw new Error(data.error.message);
+        
+        // Pengambilan teks pada format Groq/OpenAI
+        const aiText = data.choices[0].message.content;
+        
+        const typingElem = document.getElementById(typingId);
+        if (typingElem) typingElem.remove();
+
+        // 4. Tampilkan Jawaban AI
+        chatBox.innerHTML += `
+            <div style="background: rgba(0,255,0,0.05); padding: 15px 20px; border-radius: 18px 18px 18px 0; align-self: flex-start; max-width: 85%; border: 1px solid rgba(0,255,0,0.2); font-family: 'Rajdhani'; line-height: 1.6; margin-bottom: 12px; color: #e0e0e0; box-shadow: 0 4px 20px rgba(0,255,0,0.05);">
+                <div style="font-size: 0.65rem; color: #0f0; font-family: 'Orbitron'; margin-bottom: 5px; letter-spacing: 1px;">CUBE AI CORE (PML)</div>
+                ${aiText}
+            </div>
+        `;
+
+    } catch (error) {
+        console.error("AI Error:", error);
+        const typingElem = document.getElementById(typingId);
+        if (typingElem) {
+            typingElem.innerHTML = `<span style="color:#ff4444; font-family: 'Orbitron'; font-size: 0.7rem;"><i class="fa-solid fa-triangle-exclamation"></i> ERROR: SINKRONISASI GROQ GAGAL.</span>`;
+        }
+    }
+    chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
+  }
+  function openInstallForm(type) {
+    const menu = document.getElementById('install-menu');
+    const formArea = document.getElementById('install-form-area');
+    const formTitle = document.getElementById('form-title');
+    const formInputs = document.getElementById('form-inputs');
+    
+    menu.style.display = 'none';
+    formArea.style.display = 'block';
+    formInputs.innerHTML = ''; // Reset input
+
+    if (type === 'panel') {
+        formTitle.innerText = "INSTALL PTERODACTYL PANEL";
+        formInputs.innerHTML = `
+            <input type="text" id="ins-subdomain" placeholder="Domain/Subdomain (ex: panel.domain.com)" class="ins-input">
+            <input type="text" id="ins-ip" placeholder="IP VPS" class="ins-input">
+            <input type="password" id="ins-pw" placeholder="Password Root VPS" class="ins-input">
+        `;
+    } else if (type === 'wings') {
+        formTitle.innerText = "INSTALL PTERODACTYL WINGS";
+        formInputs.innerHTML = `
+            <input type="text" id="ins-node" placeholder="Node Subdomain (ex: node.domain.com)" class="ins-input">
+            <input type="text" id="ins-ip" placeholder="IP VPS" class="ins-input">
+            <input type="password" id="ins-pw" placeholder="Password Root VPS" class="ins-input">
+        `;
+    } else if (type === 'tema') {
+        formTitle.innerText = "INSTALL ENIGMA/STELLAR THEME";
+        formInputs.innerHTML = `
+            <p style="color: #ccc; font-size: 0.9rem;">*Pastikan Panel sudah terinstall sebelum memasang tema.</p>
+            <input type="text" id="ins-theme-link" placeholder="Link Download Tema (.zip)" class="ins-input">
+            <input type="password" id="ins-pw" placeholder="Password Root VPS (untuk akses file)" class="ins-input">
+            <select id="ins-theme-type" class="ins-input" style="background:#000; color:#fff;">
+                <option value="enigma">Enigma Theme</option>
+                <option value="stellar">Stellar Theme</option>
+            </select>
+        `;
+    }
+}
+
+function backToInstallMenu() {
+    document.getElementById('install-menu').style.display = 'grid';
+    document.getElementById('install-form-area').style.display = 'none';
+}
+
+function processInstall() {
+    Swal.fire({
+        title: 'Memulai Instalasi...',
+        text: 'Sistem sedang menghubungkan ke VPS. Mohon tunggu.',
+        icon: 'info',
+        background: '#000',
+        color: '#0f0',
+        showConfirmButton: false,
+        timer: 3000
+    }).then(() => {
+        Swal.fire('Gagal!', 'Koneksi SSH ditolak. Pastikan IP dan Password VPS benar.', 'error');
+    });
+}
+function logoutSystem() {
+    Swal.fire({
+        title: 'Logout?',
+        text: "Apakah Anda yakin ingin logout?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ff4444',
+        cancelButtonColor: '#333',
+        confirmButtonText: 'Ya, Logout'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // HAPUS SEMUA DATA LOGIN
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('activeUser');
+            location.reload(); // Refresh halaman untuk kembali ke menu login
+        }
+    });
+}
+// Jalankan pengecekan otomatis saat halaman dimuat
+window.onload = function() {
+    const status = localStorage.getItem('isLoggedIn');
+    const savedUser = localStorage.getItem('activeUser');
+
+    if (status === 'true' && savedUser) {
+        currentUser = savedUser;
+        
+        // Lewati layar login, langsung ke dashboard
+        document.getElementById('screen-login').classList.remove('active');
+        document.getElementById('screen-dashboard').style.display = 'block';
+        document.getElementById('top-bar').style.display = 'flex';
+        
+        // Update nama di dashboard
+        const dashUserElem = document.getElementById('display-user-dash');
+        if (dashUserElem) dashUserElem.innerText = savedUser.toUpperCase();
+        
+        // Load data lainnya (Panel/History)
+        loadUserData(); 
+        loadHistory();
+    }
+};
+</script>
+</body>
+</html>
