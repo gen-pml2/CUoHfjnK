@@ -388,91 +388,81 @@ label {
 /* Container Khusus Support Dashboard */
 .support-container {
     display: flex;
-    gap: 15px;
-    margin: 20px 0;
+    flex-wrap: wrap; /* Agar otomatis turun jika layar HP kecil */
+    gap: 10px;       /* Jarak antar tombol dikurangi */
+    margin: 15px 0;
     justify-content: center;
 }
 
-/* Tombol Glassmorphism ala Referensi */
+/* Tombol Glassmorphism - Ukuran Diperkecil */
 .support-btn {
     flex: 1;
+    min-width: 120px;   /* Mencegah tombol terlalu gepeng */
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 12px;
-    padding: 15px;
-    border-radius: 18px;
+    gap: 8px;           /* Jarak ikon ke teks diperkecil */
+    padding: 10px 12px; /* Padding dikurangi (atas-bawah 10px, kiri-kanan 12px) */
+    border-radius: 12px; /* Radius lebih kecil agar proporsional */
     text-decoration: none;
     font-family: 'Rajdhani', sans-serif;
     font-weight: 700;
-    font-size: 1.1rem;
+    font-size: 0.9rem;   /* Ukuran teks diturunkan dari 1.1rem ke 0.9rem */
     transition: all 0.3s ease;
     background: rgba(255, 255, 255, 0.03);
     backdrop-filter: blur(5px);
 }
 
-/* Telegram Style (Blue Glow) */
+/* Ikon - Ukuran Diperkecil */
+.support-btn i {
+    font-size: 1.1rem; /* Ukuran ikon diturunkan dari 1.3rem */
+}
+
+/* Telegram Style */
 .btn-tele {
     border: 1px solid rgba(0, 136, 204, 0.3);
     color: #0088cc;
 }
-
-.btn-tele i {
-    font-size: 1.3rem;
-    filter: drop-shadow(0 0 5px #0088cc);
-}
-
+.btn-tele i { filter: drop-shadow(0 0 3px #0088cc); }
 .btn-tele:hover {
     background: rgba(0, 136, 204, 0.1);
-    box-shadow: 0 0 15px rgba(0, 136, 204, 0.2);
+    box-shadow: 0 0 10px rgba(0, 136, 204, 0.2);
 }
 
-/* WhatsApp Style (Green Glow) */
+/* WhatsApp Style */
 .btn-wa {
     border: 1px solid rgba(37, 211, 102, 0.3);
     color: #25d366;
 }
-
-.btn-wa i {
-    font-size: 1.3rem;
-    filter: drop-shadow(0 0 5px #25d366);
-}
-
+.btn-wa i { filter: drop-shadow(0 0 3px #25d366); }
 .btn-wa:hover {
     background: rgba(37, 211, 102, 0.1);
-    box-shadow: 0 0 15px rgba(37, 211, 102, 0.2);
+    box-shadow: 0 0 10px rgba(37, 211, 102, 0.2);
 }
-/* Instagram Style (Pink/Purple Glow) */
+
+/* Instagram Style */
 .btn-ig {
     border: 1px solid rgba(225, 48, 108, 0.3);
     color: #e1306c;
 }
-
-.btn-ig i {
-    font-size: 1.3rem;
-    filter: drop-shadow(0 0 5px #e1306c);
-}
-
+.btn-ig i { filter: drop-shadow(0 0 3px #e1306c); }
 .btn-ig:hover {
     background: rgba(225, 48, 108, 0.1);
-    box-shadow: 0 0 15px rgba(225, 48, 108, 0.2);
+    box-shadow: 0 0 10px rgba(225, 48, 108, 0.2);
 }
 
-/* TikTok Style (Cyan/Red Glow) */
+/* TikTok Style */
 .btn-tt {
     border: 1px solid rgba(255, 0, 80, 0.3);
-    color: #fff; /* Teks putih agar lebih kontras */
-    text-shadow: 2px 0 #ff0050, -2px 0 #00f2ea; /* Efek glitch khas TikTok */
+    color: #fff;
+    text-shadow: 1px 0 #ff0050, -1px 0 #00f2ea;
 }
-
 .btn-tt i {
-    font-size: 1.3rem;
-    filter: drop-shadow(2px 0 #ff0050) drop-shadow(-2px 0 #00f2ea);
+    filter: drop-shadow(1px 0 #ff0050) drop-shadow(-1px 0 #00f2ea);
 }
-
 .btn-tt:hover {
     background: rgba(255, 255, 255, 0.05);
-    box-shadow: 0 0 15px rgba(0, 242, 234, 0.2);
+    box-shadow: 0 0 10px rgba(0, 242, 234, 0.2);
 }
 
 /* Kartu Info Tambahan (v2.0, 256-BiT, 24/7) */
@@ -728,9 +718,9 @@ label {
     </div>
     
 
-    <div id="video-loading">
-        <video id="myVideo" playsinline muted>
-            <source src="https://raw.githubusercontent.com/gen-pml2/Video-test2/ad013556d2cf57a1c1642f215d437a5e65256a51/VID20260512201955.mp4" type="video/mp4">
+<div id="video-loading">
+        <video id="myVideo" playsinline>
+            <source src="https://raw.githubusercontent.com/gen-pml2/Jj-video/main/lv_0_20260516064034.mp4" type="video/mp4">
         </video>
          <h2 style="position:absolute; bottom: 15%; width: 100%; text-align: center; font-family: 'Orbitron'; letter-spacing: 5px;">LOADING...</h2>
     </div>
