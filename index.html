@@ -577,37 +577,50 @@
             });
         }
 
-        // AKSI KIRIM PESAN TEKS & MULTIMEDIA
-        document.getElementById('send-msg-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const input = document.getElementById('msg-input');
-            const messageText = input.value.trim();
-            
-            if(!activeChatRoomId) return;
-            if(!messageText && !selectedFileBase64) return;
+// AKSI KIRIM PESAN TEKS & MULTIMEDIA (SUDAH DIPERBAIKI DARI BUG LINGKARAN CAHAYA)
+document.getElementById('send-msg-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const input = document.getElementById('msg-input');
+    const messageText = input.value.trim();
+    
+    if(!activeChatRoomId) return;
+    
+    // Validasi ketat: Jika tidak ada teks DAN tidak ada file asli yang dipilih, batalkan kirim
+    if(!messageText && (!selectedFileBase64 || selectedFileBase64 === null)) return;
 
-            const timestampStr = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) + " | " + new Date().toLocaleDateString();
+    const timestampStr = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) + " | " + new Date().toLocaleDateString();
 
-            let payload = {
-                senderCode: currentUser.code,
-                senderName: currentUser.fullName, // Disimpan untuk rendering nama di gelembung grup chat
-                senderLang: currentUser.lang,
-                text: messageText,
-                timestamp: timestampStr,
-                isDeleted: false,
-                type: "text"
-            };
+    let payload = {
+        senderCode: currentUser.code,
+        senderName: currentUser.fullName, 
+        senderLang: currentUser.lang,
+        text: messageText,
+        timestamp: timestampStr,
+        isDeleted: false,
+        type: "text" // Default type adalah teks biasa
+    };
 
-            if (selectedFileBase64) {
-                payload.type = selectedFileType;
-                payload.fileData = selectedFileBase64;
-                if (!messageText) payload.text = ""; 
-            }
+    // Logika pengiriman File: Hanya berjalan jika variabel selectedFileBase64 benar-benar berisi data string Base64 yang valid
+    if (selectedFileBase64 && typeof selectedFileBase64 === 'string' && selectedFileBase64.startsWith('data:')) {
+        payload.type = selectedFileType;
+        payload.fileData = selectedFileBase64;
+    } else {
+        // Jika bukan pengiriman file, pastikan tipe kembali ke teks untuk mencegah bug lingkaran media
+        payload.type = "text";
+        delete payload.fileData; // Hapus properti file data agar database bersih
+    }
 
-            await push(ref(db, `chats/${activeChatRoomId}`), payload);
-            input.value = "";
-            cancelFileSelection();
-        });
+    try {
+        // Kirim data bersih ke Firebase
+        await push(ref(db, `chats/${activeChatRoomId}`), payload);
+        
+        // Reset input teks dan bersihkan sisa data file di memori HP
+        input.value = "";
+        cancelFileSelection();
+    } catch (error) {
+        console.error("Gagal mengirim pesan:", error);
+    }
+});
 
         // KONTROL TELEPON / VOICE NOTE / JITSI TETAP SAMA SEPERTI SEBELUMNYA
         document.getElementById('btn-vn').addEventListener('click', async function() {
