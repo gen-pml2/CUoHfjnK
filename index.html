@@ -19,7 +19,7 @@
         <div class="text-center mb-8">
             <i class="fa-brands fa-whatsapp text-6xl text-[#00a884] mb-3"></i>
             <h1 class="text-2xl font-bold text-[#e9edef] mb-1">WhatsApp Chatsder Pro</h1>
-            <p class="text-[#8696a0] text-sm">Upgrade: Voice Note, Call & Video Call</p>
+            <p class="text-[#8696a0] text-sm">Upgrade: Auto-Login & Anti Hilang saat Refresh</p>
         </div>
         
         <form id="reg-form" class="space-y-4">
@@ -66,6 +66,9 @@
                         <p id="user-country-tag" class="text-[11px] text-[#8696a0]"></p>
                     </div>
                 </div>
+                <div class="flex items-center gap-4 text-[#aebac1] text-sm">
+                    <button id="btn-logout" class="hover:text-rose-400 text-xs bg-[#2a3942] px-2 py-1 rounded transition border border-[#374248]">Keluar</button>
+                </div>
             </div>
             <div class="p-3 bg-[#182229] border-b border-[#222e35]">
                 <div class="bg-[#202c33] p-2 rounded-lg text-center">
@@ -85,7 +88,7 @@
             <div id="chat-room-placeholder" class="absolute inset-0 flex flex-col items-center justify-center p-8 text-center bg-[#222e35] border-b-4 border-[#00a884] z-10">
                 <i class="fa-brands fa-whatsapp text-8xl text-[#374248] mb-4"></i>
                 <h2 class="text-xl font-light">WhatsApp Web - Chatsder Pro</h2>
-                <p class="text-sm text-[#8696a0] max-w-xs mt-1">Sekarang mendukung pengiriman VN serta Panggilan Suara & Video Call langsung dari browser.</p>
+                <p class="text-sm text-[#8696a0] max-w-xs mt-1">Akun Anda sekarang tersimpan aman di browser ini meskipun halaman di-refresh.</p>
             </div>
 
             <div id="chat-room" class="w-full h-full flex flex-col relative">
@@ -171,7 +174,6 @@
         let activeFriend = null;
         let activeChatRoomId = null;
         
-        // Variabel Voice Recorder & Jitsi Call
         let mediaRecorder = null;
         let audioChunks = [];
         let isRecording = false;
@@ -196,11 +198,39 @@
             return code;
         }
 
-        // Pendaftaran Akun Baru
+        // --- CORE FITUR: PROSES MASUK HALAMAN UTAMA (DIPAKAI OLEH REGISTER & AUTO-LOGIN) ---
+        function enterChatDashboard(userData) {
+            currentUser = userData;
+            
+            // Sembunyikan form register, tampilkan dashboard chat
+            document.getElementById('register-page').classList.add('hidden');
+            document.getElementById('chat-page').classList.remove('hidden');
+            
+            // Pasang identitas user ke UI
+            document.getElementById('user-avatar').innerText = currentUser.gender === 'Laki-laki' ? '👨‍💻' : '👩‍💻';
+            document.getElementById('user-display-name').innerText = currentUser.fullName;
+            document.getElementById('user-country-tag').innerText = `${currentUser.flag} Anda`;
+            document.getElementById('my-code-display').innerText = currentUser.code;
+            
+            // Nyalakan pemantau kontak & radar panggilan masuk
+            listenToMyFriends();
+            listenToIncomingCalls();
+        }
+
+        // --- SYSTEM ENGINE: MEMERIKSA SESI LOGIN SAAT HALAMAN DI-REFRESH ---
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedUser = localStorage.getItem('chatsder_session');
+            if (savedUser) {
+                const parsedUserData = JSON.parse(savedUser);
+                enterChatDashboard(parsedUserData);
+            }
+        });
+
+        // Event Tombol Pendaftaran Akun Baru (Hanya jalan 1 kali di awal)
         document.getElementById('reg-form').addEventListener('submit', async function(e) {
             e.preventDefault();
             const submitBtn = document.getElementById('submit-btn');
-            submitBtn.innerText = "SABAR YA..."; submitBtn.disabled = true;
+            submitBtn.innerText = "MENGHUBUNGKAN..."; submitBtn.disabled = true;
 
             try {
                 const firstName = document.getElementById('first-name').value;
@@ -210,27 +240,37 @@
                 const flagMap = { 'ID': '🇮🇩', 'US': '🇺🇸', 'JP': '🇯🇵', 'KR': '🇰🇷' };
                 const generatedCode = await generateUniqueCode();
 
-                currentUser = {
+                const newUserData = {
                     code: generatedCode, firstName, lastName, fullName: `${firstName} ${lastName}`,
                     gender, countryCode: countryData[0], lang: countryData[1], flag: flagMap[countryData[0]]
                 };
 
-                await set(ref(db, 'users/' + currentUser.code), currentUser);
-                showAlert(`Berhasil Masuk!`, `Kode WhatsApp kamu: ${generatedCode}`, currentUser.flag);
+                // 1. Simpan ke Firebase Database cloud
+                await set(ref(db, 'users/' + newUserData.code), newUserData);
+                
+                // 2. KUNCI UTAMA: Simpan ke memori lokal browser agar anti-refresh
+                localStorage.setItem('chatsder_session', JSON.stringify(newUserData));
+
+                showAlert(`Berhasil Masuk!`, `Kode WhatsApp kamu: ${generatedCode}`, newUserData.flag);
 
                 setTimeout(() => {
                     closeAlert();
-                    document.getElementById('register-page').classList.add('hidden');
-                    document.getElementById('chat-page').classList.remove('hidden');
-                    document.getElementById('user-avatar').innerText = currentUser.gender === 'Laki-laki' ? '👨‍💻' : '👩‍💻';
-                    document.getElementById('user-display-name').innerText = currentUser.fullName;
-                    document.getElementById('user-country-tag').innerText = `${currentUser.flag} Anda`;
-                    document.getElementById('my-code-display').innerText = currentUser.code;
-                    
-                    listenToMyFriends();
-                    listenToIncomingCalls(); // Aktifkan radar pendengar panggilan masuk
-                }, 2000);
-            } catch (error) { alert("Gagal koneksi database."); submitBtn.disabled = false; }
+                    enterChatDashboard(newUserData);
+                }, 1500);
+            } catch (error) { 
+                alert("Gagal koneksi database."); 
+                submitBtn.disabled = false; 
+                submitBtn.innerText = "Masuk Obrolan";
+            }
+        });
+
+        // Fitur Keluar (Logout) untuk menghapus memori jika ingin mendaftar ulang
+        document.getElementById('btn-logout').addEventListener('click', async () => {
+            if (confirm("Apakah Anda ingin keluar dan menghapus akun ini dari perangkat?")) {
+                if(currentUser) await set(ref(db, `calls/${currentUser.code}`), null);
+                localStorage.removeItem('chatsder_session');
+                window.location.reload(); // Refresh halaman untuk kembali ke menu register
+            }
         });
 
         // Tambah Teman via Kode
@@ -282,7 +322,6 @@
             document.getElementById('sidebar').classList.remove('-translate-x-full');
         });
 
-        // ----------------- ENGINE PENGIRIMAN & PENERIMAAN PESAN (Teks & VN) -----------------
         function listenToMessages() {
             onValue(ref(db, `chats/${activeChatRoomId}`), (snapshot) => {
                 const container = document.getElementById('message-container'); container.innerHTML = "";
@@ -294,7 +333,6 @@
                         const msgWrapper = document.createElement('div');
                         msgWrapper.className = `flex ${isMe ? 'justify-end' : 'justify-start'} w-full mb-1`;
 
-                        // Pembeda Render antara Teks Biasa vs Audio VN
                         let messageBody = `<p class="text-[14.5px] break-words ${msg.isDeleted ? 'italic text-[#8696a0]' : ''}" id="text-${msgId}">${msg.text}</p>`;
                         if (msg.type === "voice" && !msg.isDeleted) {
                             messageBody = `
@@ -332,11 +370,10 @@
             input.value = "";
         });
 
-        // ----------------- ENGINE INTEGRASI PEREKAM VOICE NOTE -----------------
+        // Voice Note
         document.getElementById('btn-vn').addEventListener('click', async function() {
             const icon = document.getElementById('vn-icon');
             if (!isRecording) {
-                // Mulai Rekam Audio
                 if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return alert("Browser Anda menolak akses mikrofon.");
                 try {
                     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -346,7 +383,6 @@
                     
                     mediaRecorder.onstop = async () => {
                         const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
-                        // Konversi berkas audio biner menjadi String Base64 agar muat dikirim via Firebase
                         const reader = new FileReader();
                         reader.readAsDataURL(audioBlob);
                         reader.onloadend = async () => {
@@ -364,7 +400,6 @@
                     icon.className = "fa-solid fa-stop text-rose-500 animate-pulse";
                 } catch(err) { alert("Izin mikrofon ditolak."); }
             } else {
-                // Berhenti Rekam & Kirim Otomatis
                 mediaRecorder.stop();
                 mediaRecorder.stream.getTracks().forEach(track => track.stop());
                 isRecording = false;
@@ -372,21 +407,15 @@
             }
         });
 
-        // ----------------- ENGINE LAYANAN REALTIME TELEPON & VC (VIA JITSI) -----------------
+        // Telepon & VC Sinyal
         async function startCallSignal(callType) {
             if(!activeFriend) return;
             const roomId = "ChatsderCall_" + Math.random().toString(36).substring(7);
-            
-            // Tulis info panggilan ke database tujuan agar HP teman mendeteksi dering
             await set(ref(db, `calls/${activeFriend.code}`), {
                 callerCode: currentUser.code, callerName: currentUser.fullName,
                 type: callType, jitsiRoom: roomId, status: "pending"
             });
-            
-            // Buka frame monitor telepon milik kita sendiri sembari menunggu diangkat
             launchJitsiFrame(roomId, callType);
-            
-            // Pantau respon teman apakah ditolak/dimatikan di seberang sana
             onValue(ref(db, `calls/${activeFriend.code}`), (snapshot) => {
                 if(snapshot.exists() && snapshot.val().status === "rejected") {
                     closeJitsiCall();
@@ -405,14 +434,12 @@
                         document.getElementById('call-type-label').innerText = callData.type === "video" ? "Panggilan Video Masuk..." : "Panggilan Suara Masuk...";
                         document.getElementById('incoming-call-modal').classList.remove('hidden');
                         
-                        // Handler Jika Kita Mengangkat Panggilan
                         document.getElementById('btn-accept-call').onclick = async () => {
                             await update(ref(db, `calls/${currentUser.code}`), { status: "accepted" });
                             document.getElementById('incoming-call-modal').classList.add('hidden');
                             launchJitsiFrame(callData.jitsiRoom, callData.type);
                         };
                         
-                        // Handler Jika Kita Menolak Panggilan
                         document.getElementById('btn-reject-call').onclick = async () => {
                             await update(ref(db, `calls/${currentUser.code}`), { status: "rejected" });
                             document.getElementById('incoming-call-modal').classList.add('hidden');
