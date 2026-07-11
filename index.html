@@ -147,21 +147,22 @@
                     <button type="button" onclick="cancelFileSelection()" class="text-rose-500 hover:text-rose-400 text-lg px-2"><i class="fa-solid fa-xmark"></i></button>
                 </div>
 
-                <form id="send-msg-form" class="min-h-[62px] bg-[#202c33] px-4 py-2 flex gap-3 items-center shrink-0 z-30">
-                    <label class="text-[#aebac1] hover:text-white text-xl w-10 h-10 flex items-center justify-center transition shrink-0 cursor-pointer">
-                        <i class="fa-solid fa-paperclip text-[#8696a0] hover:text-[#00a884]"></i>
-                        <input type="file" id="media-file-input" accept="image/*,video/*" class="hidden" onchange="handleFileSelection(this)">
-                    </label>
+        <form id="send-msg-form" class="min-h-[60px] bg-[#202c33] px-2 sm:px-4 py-2 flex gap-1 sm:gap-3 items-center shrink-0 z-30 w-full">
+            <label class="text-[#aebac1] hover:text-white text-lg sm:text-xl w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center transition shrink-0 cursor-pointer">
+                <i class="fa-solid fa-paperclip text-[#8696a0] hover:text-[#00a884]"></i>
+                <input type="file" id="media-file-input" accept="image/*,video/*" class="hidden" onchange="handleFileSelection(this)">
+            </label>
 
-                    <input type="text" id="msg-input" placeholder="Ketik pesan" autocomplete="off" class="flex-1 h-[42px] bg-[#2a3942] rounded-lg focus:outline-none px-4 text-sm text-[#e9edef]">
-                    
-                    <button type="button" id="btn-vn" class="text-[#aebac1] hover:text-white text-xl w-10 h-10 flex items-center justify-center transition shrink-0">
-                        <i class="fa-solid fa-microphone text-[#8696a0]" id="vn-icon"></i>
-                    </button>
-                    <button type="submit" class="text-[#aebac1] hover:text-white text-xl w-10 h-10 flex items-center justify-center transition shrink-0">
-                        <i class="fa-solid fa-paper-plane text-[#00a884]"></i>
-                    </button>
-                </form>
+            <input type="text" id="msg-input" placeholder="Ketik pesan" autocomplete="off" class="flex-1 min-w-0 h-[38px] sm:h-[42px] bg-[#2a3942] rounded-lg focus:outline-none px-3 sm:px-4 text-sm text-[#e9edef]">
+            
+            <button type="button" id="btn-vn" class="text-[#aebac1] hover:text-white text-lg sm:text-xl w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center transition shrink-0">
+                <i class="fa-solid fa-microphone text-[#8696a0]" id="vn-icon"></i>
+            </button>
+            
+            <button type="submit" class="text-[#aebac1] hover:text-white text-lg sm:text-xl w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center transition shrink-0 bg-[#00a884]/10 rounded-full">
+                <i class="fa-solid fa-paper-plane text-[#00a884]"></i>
+            </button>
+        </form>
             </div>
         </div>
     </div>
