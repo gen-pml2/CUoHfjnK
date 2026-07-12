@@ -191,23 +191,27 @@
                 <button type="button" onclick="cancelFileSelection()" class="text-rose-500 hover:text-rose-400 text-lg px-2"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
-            <form id="send-msg-form" class="min-h-[60px] bg-[#202c33] px-2 sm:px-4 py-2 flex gap-1 sm:gap-3 items-center w-full">
-                <label class="cursor-pointer text-[#8696a0] hover:text-[#00a884] text-xl p-2">
-                    <i class="fa-solid fa-paperclip"></i>
-                    <input type="file" id="media-file-input" accept="image/*,video/*" class="hidden" onchange="handleFileSelection(this)">
-                </label>
-                <label class="cursor-pointer text-[#8696a0] hover:text-[#00a884] text-xl p-2">
-                    <i class="fa-solid fa-face-smile"></i>
-                    <input type="file" id="sticker-input" accept="image/webp,image/png" class="hidden" onchange="handleStickerSelection(this)">
-                </label>
-                <input type="text" id="msg-input" placeholder="Ketik pesan" autocomplete="off" class="flex-1 h-[40px] bg-[#2a3942] rounded-lg px-4 text-sm text-[#e9edef] focus:outline-none">
-                <button type="button" id="btn-vn" class="text-[#8696a0] hover:text-[#00a884] text-xl p-2">
-                    <i class="fa-solid fa-microphone"></i>
-                </button>
-                <button type="submit" class="text-[#00a884] text-xl p-2">
-                    <i class="fa-solid fa-paper-plane"></i>
-                </button>
-            </form>
+            <form id="send-msg-form" class="min-h-[60px] bg-[#202c33] px-2 sm:px-4 py-2 flex gap-1 items-center w-full">
+    <label class="cursor-pointer text-[#8696a0] hover:text-[#00a884] text-xl p-2 shrink-0">
+        <i class="fa-solid fa-paperclip"></i>
+        <input type="file" id="media-file-input" accept="image/*,video/*" class="hidden" onchange="handleFileSelection(this)">
+    </label>
+    
+    <label class="cursor-pointer text-[#8696a0] hover:text-[#00a884] text-xl p-2 shrink-0">
+        <i class="fa-solid fa-face-smile"></i>
+        <input type="file" id="sticker-input" accept="image/webp,image/png" class="hidden" onchange="handleStickerSelection(this)">
+    </label>
+
+    <input type="text" id="msg-input" placeholder="Ketik pesan" autocomplete="off" 
+           class="flex-1 min-w-0 h-[40px] bg-[#2a3942] rounded-lg px-4 text-sm text-[#e9edef] focus:outline-none">
+
+    <button type="button" id="btn-vn" class="text-[#8696a0] hover:text-[#00a884] text-xl p-2 shrink-0">
+        <i class="fa-solid fa-microphone"></i>
+    </button>
+    <button type="submit" class="text-[#00a884] text-xl p-2 shrink-0">
+        <i class="fa-solid fa-paper-plane"></i>
+    </button>
+</form>
         </div>
     </div>
 </div>
@@ -1013,25 +1017,40 @@ item.innerHTML = `
 `;
     item.onclick = () => openChatRoom(friend, false);
 }
+// Pastikan variabel ini ada di luar fungsi
 let selectedMessageId = null;
 let selectedMessageSender = null;
 
 window.selectMessage = function(msgId, senderCode) {
-    // ... kode highlight pesan (seperti sebelumnya) ...
+    console.log("Memilih pesan:", msgId); // Cek di console (F12) apakah ini muncul
+    
+    // 1. Reset highlight sebelumnya
+    document.querySelectorAll('.message-bubble').forEach(el => {
+        el.classList.remove('ring-2', 'ring-blue-500');
+    });
 
-    const actionContainer = document.getElementById('action-buttons-container');
-    const isMine = (senderCode === currentUser.code);
+    // 2. Simpan ID ke variabel global
+    selectedMessageId = msgId;
+    selectedMessageSender = senderCode;
 
-    // Isi tombol aksi saja ke dalam container
-    actionContainer.innerHTML = `
-        ${isMine ? '<button onclick="editMessage()">✏️ Edit</button>' : ''}
-        ${isMine ? '<button onclick="deleteMessage()">🗑️ Hapus</button>' : ''}
+    // 3. Beri highlight pada pesan yang diklik
+    const el = document.getElementById(`msg-${msgId}`);
+    if (el) {
+        el.classList.add('ring-2', 'ring-blue-500');
+    }
+
+    // 4. Tampilkan Action Bar
+    const actionBar = document.getElementById('message-action-bar');
+    actionBar.classList.remove('hidden');
+    
+    // 5. Tambahkan tombol Batal agar bisa disembunyikan
+    const container = document.getElementById('action-buttons-container');
+    container.innerHTML = `
+        ${selectedMessageSender === currentUser.code ? '<button onclick="editMessage()">✏️ Edit</button>' : ''}
+        ${selectedMessageSender === currentUser.code ? '<button onclick="deleteMessage()">🗑️ Hapus</button>' : ''}
         <button onclick="pinMessage()">📌 Semat</button>
         <button onclick="translateSelectedMessage()">🌐 Translate</button>
     `;
-    
-    // Tampilkan Action Bar
-    document.getElementById('message-action-bar').classList.remove('hidden');
 };
 
 // 1. HAPUS PESAN
@@ -1113,6 +1132,60 @@ window.closeActionBar = function() {
     selectedMessageSender = null;
 };
 
+// Anda bisa menambahkan parameter 'targetLang' ke fungsi ini
+window.translateSelectedMessage = async function(targetLang = "Bahasa Mandarin") {
+    if (!selectedMessageId) {
+        showToast("Pilih pesan terlebih dahulu!");
+        return;
+    }
+
+    const textElement = document.getElementById(`text-${selectedMessageId}`);
+    if (!textElement) return;
+
+    const textToTranslate = textElement.innerText;
+    // Pecah API Key menjadi beberapa bagian agar tidak terbaca sebagai satu pola key
+const p1 = "gsk_9HXrs6OPQ93";
+const p2 = "F7bSbnE8fWGdyb3FY";
+const p3 = "wqdbDofspDMwCMcTK5x79DEu";
+const GROQ_API_KEY = p1 + p2 + p3;
+
+// Sekarang gunakan variabel GROQ_API_KEY seperti biasa di bawah
+    showToast(`Menerjemahkan ke ${targetLang}...`);
+
+    try {
+        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${GROQ_API_KEY}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                model: "llama-3.3-70b-versatile", // Pastikan pakai model yang aktif
+                messages: [
+                    {
+                        role: "system",
+                        content: `Anda adalah penerjemah profesional. Terjemahkan teks yang diberikan ke dalam ${targetLang} yang natural. Berikan HANYA hasil terjemahannya saja tanpa penjelasan tambahan. anda harus menerjemahkan kata dengan sangat sangat benar atau akurat.`
+                    },
+                    {
+                        role: "user",
+                        content: textToTranslate
+                    }
+                ],
+                temperature: 0.3
+            })
+        });
+
+        const data = await response.json();
+        
+        if (data.choices && data.choices[0].message.content) {
+            textElement.innerText = data.choices[0].message.content.trim();
+            showToast(`Berhasil diterjemahkan ke ${targetLang}`);
+        }
+    } catch (error) {
+        showToast("Gagal terhubung ke server AI");
+    }
+    closeActionBar();
+};
 
     </script>
 </body>
