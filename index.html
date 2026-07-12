@@ -16,6 +16,12 @@
         body { background: #0b141a; color: #e9edef; font-family: Segoe UI, Helvetica Neue, Helvetica, Arial, sans-serif; overflow: hidden; }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: #374248; border-radius: 10px; }
+
+        .message-bubble {
+    pointer-events: auto !important;
+    cursor: pointer;
+}
+
     </style>
 </head>
 <body class="notranslate dynamic-height w-screen flex items-center justify-center sm:p-4 bg-[#0b141a] sm:bg-[#111b21] overflow-hidden">
@@ -24,8 +30,8 @@
     <div id="register-page" class="w-full h-full sm:h-auto sm:max-w-md bg-[#222e35] p-8 sm:rounded-2xl shadow-2xl flex flex-col justify-center">
         <div class="text-center mb-8">
             <i class="fa-brands fa-whatsapp text-6xl text-[#00a884] mb-3"></i>
-            <h1 class="text-2xl font-bold text-[#e9edef] mb-1">WhatsApp Chatsder Pro</h1>
-            <p class="text-[#8696a0] text-sm">Sekarang Mendukung Fitur Pembuatan Grup</p>
+            <h1 class="text-2xl font-bold text-[#e9edef] mb-1">CHATSDER</h1>
+            <p class="text-[#8696a0] text-sm">mirip whatsapp tapi lebih hemat, karena ga butuh nomor hanya daftar saja</p>
         </div>
         
         <form id="reg-form" class="space-y-4">
@@ -250,6 +256,23 @@
     </div>
 </div>
 
+<div id="message-action-bar" class="hidden flex gap-4 p-2 bg-[#1f2c34] text-white">
+    <button onclick="editMessage()">✏️ Edit</button>
+    <button onclick="deleteMessage()">🗑️ Hapus</button>
+    <button onclick="pinMessage()">📌 Semat</button>
+</div>
+
+<div id="edit-message-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-[1000]">
+    <div class="bg-[#111b21] p-5 rounded-lg w-[90%] max-w-sm">
+        <h3 class="text-white mb-3">Edit Pesan</h3>
+        <textarea id="edit-message-input" class="w-full bg-[#2a3942] text-white p-2 rounded"></textarea>
+        <div class="flex justify-end gap-2 mt-4">
+            <button onclick="document.getElementById('edit-message-modal').classList.add('hidden')" class="text-gray-400">Batal</button>
+            <button onclick="saveEditMessage()" class="text-[#00a884] font-bold">Simpan</button>
+        </div>
+    </div>
+</div>
+
     <!-- LOGIK DATABASE INTERACTION -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -444,51 +467,75 @@
             onValue(ref(db, `users/${currentUser.code}/groups`), () => { renderCombinedChatList(); });
         }
 
-        async function renderCombinedChatList() {
+async function renderCombinedChatList() {
     const chatListContainer = document.getElementById('chat-list-view');
-    chatListContainer.innerHTML = "";
+    chatListContainer.innerHTML = ""; 
     
-    // Asumsi: Anda sudah mengambil data dari Firebase
     const friendsSnap = await get(ref(db, `users/${currentUser.code}/friends`));
+    if (!friendsSnap.exists()) return;
 
-    if (friendsSnap.exists()) {
-        friendsSnap.forEach(childSnap => {
-            const friend = childSnap.val();
-            const roomId = currentUser.code < friend.code ? `room_${currentUser.code}_${friend.code}` : `room_${friend.code}_${currentUser.code}`;
-            
-            // Listener untuk menghitung pesan yang belum dibaca (isRead: false)
-            onValue(ref(db, `chats/${roomId}`), (snapshot) => {
+    // Gunakan Event Delegation pada container utama
+    chatListContainer.onclick = (e) => {
+        const target = e.target;
+        // Cari apakah yang diklik adalah bagian dari avatar atau nama chat
+        const avatarBtn = target.closest('[data-type="avatar"]');
+        const chatBtn = target.closest('[data-type="chat"]');
+
+        if (avatarBtn) {
+            const { name, code, flag } = avatarBtn.dataset;
+            viewProfile(name, code, flag);
+        } else if (chatBtn) {
+            // Mengambil data teman dari attribute JSON yang aman
+            const friendData = JSON.parse(chatBtn.dataset.friend);
+            openChatRoom(friendData, false);
+        }
+    };
+
+    friendsSnap.forEach(childSnap => {
+        const friendBasic = childSnap.val();
+        const roomId = currentUser.code < friendBasic.code ? 
+                       `room_${currentUser.code}_${friendBasic.code}` : 
+                       `room_${friendBasic.code}_${currentUser.code}`;
+        
+        const elementId = `chat-item-${friendBasic.code}`;
+        const item = document.createElement('div');
+        item.id = elementId;
+        item.className = "flex items-center gap-3 p-3 hover:bg-[#202c33] cursor-pointer transition px-4";
+        chatListContainer.appendChild(item);
+
+        onValue(ref(db, `users/${friendBasic.code}`), (userSnapshot) => {
+            const friendProfile = userSnapshot.val();
+            if (!friendProfile) return;
+
+            onValue(ref(db, `chats/${roomId}`), (chatSnapshot) => {
                 let unreadCount = 0;
-                if (snapshot.exists()) {
-                    snapshot.forEach((child) => {
-                        const msg = child.val();
-                        if (msg.senderCode !== currentUser.code && !msg.isRead) {
-                            unreadCount++;
-                        }
-                    });
-                }
+                chatSnapshot.forEach(child => {
+                    const msg = child.val();
+                    if (msg.senderCode !== currentUser.code && msg.isRead === false) unreadCount++;
+                });
 
-                // Render elemen list
-                const item = document.createElement('div');
-                item.className = "flex items-center gap-3 p-3 hover:bg-[#202c33] cursor-pointer transition px-4";
-                item.onclick = () => openChatRoom(friend, false);
-                item.innerHTML = `
-                    <div class="w-11 h-11 bg-[#2a3942] rounded-full flex items-center justify-center text-lg cursor-pointer" 
-                         onclick="event.stopPropagation(); viewProfile('${friend.fullName}', '${friend.code}', '${friend.flag}')">
-                         ${friend.flag}
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <p class="font-medium text-sm truncate text-[#e9edef]">${friend.fullName}</p>
-                    </div>
-                    ${unreadCount > 0 ? `<div class="bg-[#00a884] text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold">${unreadCount}</div>` : ''}
-                `;
-                chatListContainer.appendChild(item);
+                const targetEl = document.getElementById(elementId);
+                if (targetEl) {
+                    const avatarDisplay = friendProfile.avatar 
+                        ? `<img src="${friendProfile.avatar}" class="w-11 h-11 rounded-full object-cover">`
+                        : `<div class="w-11 h-11 bg-[#2a3942] rounded-full flex items-center justify-center text-lg">${friendProfile.flag || '👤'}</div>`;
+
+                    // Gunakan data-attribute untuk menyimpan data teman agar bisa diambil oleh Event Delegation
+                    targetEl.innerHTML = `
+                        <div data-type="avatar" data-name="${friendProfile.fullName}" data-code="${friendProfile.code}" data-flag="${friendProfile.flag}" class="cursor-pointer">
+                             ${avatarDisplay}
+                        </div>
+                        <div data-type="chat" data-friend='${JSON.stringify(friendProfile)}' class="flex-1 min-w-0">
+                            <p class="font-medium text-sm truncate text-[#e9edef]">${friendProfile.fullName}</p>
+                        </div>
+                        ${unreadCount > 0 ? `<div class="bg-[#00a884] text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold">${unreadCount}</div>` : ''}
+                    `;
+                }
             });
         });
-    }
+    });
 }
-
-        function openChatRoom(target, isGroup) {
+function openChatRoom(target, isGroup) {
     activeTarget = target; 
     isGroupChat = isGroup;
     document.getElementById('chat-room-placeholder').classList.add('hidden');
@@ -500,26 +547,21 @@
     const callVideoBtn = document.getElementById('btn-call-video');
 
     if (isGroupChat) {
-        document.getElementById('active-chat-avatar').innerText = "👥";
-        document.getElementById('active-chat-name').innerText = target.groupName;
-        document.getElementById('active-chat-status').innerText = "Anggota Grup Terkoneksi";
+        // ... (Logika grup Anda tetap sama)
         activeChatRoomId = `room_${target.groupId}`;
         callVoiceBtn.classList.add('hidden'); callVideoBtn.classList.add('hidden');
     } else {
-        document.getElementById('active-chat-avatar').innerText = target.flag;
-        document.getElementById('active-chat-name').innerText = target.fullName;
-        document.getElementById('active-chat-status').innerText = "online";
+        // ... (Logika personal chat Anda tetap sama)
         activeChatRoomId = currentUser.code < target.code ? `room_${currentUser.code}_${target.code}` : `room_${target.code}_${currentUser.code}`;
         callVoiceBtn.classList.remove('hidden'); callVideoBtn.classList.remove('hidden');
     }
 
-    // --- BAGIAN TAMBAHAN: TANDAI PESAN SEBAGAI DIBACA ---
+    // TANDAI PESAN SEBAGAI DIBACA
     if (!isGroupChat) {
         get(ref(db, `chats/${activeChatRoomId}`)).then((snapshot) => {
             if (snapshot.exists()) {
                 snapshot.forEach((child) => {
                     const msg = child.val();
-                    // Jika pesan dari orang lain dan belum dibaca, ubah jadi true
                     if (msg.senderCode !== currentUser.code && msg.isRead === false) {
                         update(ref(db, `chats/${activeChatRoomId}/${child.key}`), { isRead: true });
                     }
@@ -527,11 +569,21 @@
             }
         });
     }
-    // ----------------------------------------------------
+
+    // Di dalam openChatRoom, pastikan bagian ini mengambil avatar terbaru
+if (!isGroupChat) {
+    // Ambil data teman terbaru dari database
+    get(ref(db, `users/${target.code}`)).then((snapshot) => {
+        const latestProfile = snapshot.val();
+        document.getElementById('active-chat-avatar').innerHTML = latestProfile.avatar 
+            ? `<img src="${latestProfile.avatar}" class="w-full h-full object-cover rounded-full">` 
+            : latestProfile.flag;
+        document.getElementById('active-chat-name').innerText = latestProfile.fullName;
+    });
+}
 
     listenToMessages();
 }
-
         document.getElementById('back-to-list-btn').addEventListener('click', () => {
             document.getElementById('chat-area').classList.add('translate-x-full');
             document.getElementById('sidebar').classList.remove('-translate-x-full');
@@ -565,73 +617,65 @@
             }
         };
 
-        function listenToMessages() {
-            onValue(ref(db, `chats/${activeChatRoomId}`), (snapshot) => {
-                const container = document.getElementById('message-container'); container.innerHTML = "";
-                if(snapshot.exists()) {
-                    snapshot.forEach((childSnapshot) => {
-                        const msgId = childSnapshot.key; const msg = childSnapshot.val();
-                        if (localStorage.getItem(`deleted_${msgId}_${currentUser.code}`)) return;
-                        const isMe = msg.senderCode === currentUser.code;
-                        
-                        const msgWrapper = document.createElement('div');
-                        msgWrapper.className = `flex ${isMe ? 'flex-row-reverse' : 'flex-row'} items-center gap-2 w-full mb-1 group`;
+function listenToMessages() {
+    onValue(ref(db, `chats/${activeChatRoomId}`), (snapshot) => {
+        const container = document.getElementById('message-container');
+        container.innerHTML = "";
+        if (!snapshot.exists()) return;
 
-                        // Di dalam fungsi listenToMessages, ubah bagian ini:
-                        // Temukan bagian di dalam fungsi listenToMessages dan pastikan kodenya seperti ini:
-                        let messageBody = `<p id="text-${msgId}" data-original="${msg.text}" class="notranslate text-[14.5px] break-words ${msg.isDeleted ? 'italic text-[#8696a0]' : ''}">${msg.text}</p>`;
-                        let hasText = msg.text && msg.text.trim().length > 0 && !msg.isDeleted;
+        snapshot.forEach((childSnapshot) => {
+            const msgId = childSnapshot.key;
+            const msg = childSnapshot.val();
+            
+            // Cek apakah pesan sudah dihapus untuk user ini
+            if (msg.deletedFor === currentUser.code) return;
+            
+            const isMe = msg.senderCode === currentUser.code;
+            
+            // 1. Tentukan tampilan isi pesan berdasarkan tipe
+            let messageBody = `<p id="text-${msgId}" data-original="${msg.text || ''}" class="notranslate text-[14.5px] break-words">${msg.text || ''}</p>`;
+            let hasText = (msg.text && msg.text.trim().length > 0);
 
-                        // Di dalam switch/if tipe pesan:
-                        if (msg.type === "sticker") {
-                            messageBody = `
-                                <div class="relative group">
-                                    <img src="${msg.stickerData}" class="w-24 h-24 object-contain">
-                                    ${msg.senderCode !== currentUser.code ? 
-                                        `<button onclick="saveSticker('${msg.stickerData}')" class="absolute top-0 right-0 bg-black/50 text-white p-1 text-[10px] rounded">+</button>` 
-                                        : ''}
-                                </div>
-                            `;
-                            hasText = false;
-                        }
+            if (msg.type === "sticker") {
+                messageBody = `<img src="${msg.stickerData}" class="w-32 h-32 object-contain">`;
+                hasText = false;
+            } else if (msg.type === "image") {
+                messageBody = `<div class="space-y-1"><img src="${msg.fileData}" class="max-w-full rounded-lg max-h-64 object-cover cursor-pointer" onclick="window.open(this.src)">${msg.text ? `<p class="mt-1">${msg.text}</p>` : ''}</div>`;
+            } else if (msg.type === "voice") {
+                messageBody = `<div class="flex items-center gap-2 py-1"><i class="fa-solid fa-play text-xl cursor-pointer text-[#00a884]" onclick="this.nextElementSibling.play()"></i><audio src="${msg.audioData}" class="hidden"></audio></div>`;
+                hasText = false;
+            }
 
-                        if (!msg.isDeleted) {
-                            if (msg.type === "image") {
-                                messageBody = `<div class="space-y-1"><img src="${msg.fileData}" class="max-w-full rounded-lg max-h-64 object-cover cursor-pointer border border-[#374248]" onclick="window.open(this.src)">${msg.text ? `<p id="text-${msgId}" data-original="${msg.text}" class="text-[14.5px] break-words mt-1">${msg.text}</p>` : ''}</div>`;
-                            } else if (msg.type === "video") {
-                                messageBody = `<div class="space-y-1"><video src="${msg.fileData}" controls class="max-w-full rounded-lg max-h-64 border border-[#374248] bg-black"></video>${msg.text ? `<p id="text-${msgId}" data-original="${msg.text}" class="text-[14.5px] break-words mt-1">${msg.text}</p>` : ''}</div>`;
-                            } else if (msg.type === "voice") {
-                                messageBody = `<div class="flex items-center gap-2 py-1"><i class="fa-solid fa-play text-xl cursor-pointer text-[#00a884]" onclick="this.nextElementSibling.paused ? this.nextElementSibling.play() : this.nextElementSibling.pause()"></i><audio src="${msg.audioData}" controls class="w-[200px] h-8 text-xs bg-transparent invert opacity-80"></audio></div>`;
-                                hasText = false;
-                            }
-                        }
+            // 2. Buat elemen wrapper
+            const msgWrapper = document.createElement('div');
+            msgWrapper.className = `flex ${isMe ? 'flex-row-reverse' : 'flex-row'} items-center gap-2 w-full mb-1 group`;
 
-                        const senderTag = (isGroupChat && !isMe) ? `<p class="text-[10px] font-bold text-[#00a884] mb-0.5">${msg.senderName || 'Anggota'}</p>` : '';
-
-                        // Tombol Translate muncul di samping kiri/kanan gelembung chat (hanya jika ada teks)
-                        const translateBtn = hasText ? `
-                            <button id="btn-trans-${msgId}" onclick="translateSingleMessage('${msgId}', '${currentUser.lang}')" title="Terjemahkan" class="opacity-0 group-hover:opacity-100 transition-opacity w-7 h-7 bg-[#202c33] border border-[#374248] rounded-full flex items-center justify-center text-xs shadow">
-                                <i class="fa-solid fa-language text-[#8696a0] hover:text-[#00a884]"></i>
-                            </button>
-                        ` : '';
-
-                        msgWrapper.innerHTML = `
-                            <div class="max-w-[80%] md:max-w-md ${isMe ? 'bg-[#005c4b]' : 'bg-[#202c33]'} p-2 px-3 rounded-lg shadow relative min-w-[100px]">
-                                ${senderTag}
-                                ${messageBody}
-                                <div class="flex items-center justify-end gap-1 text-[9px] text-[#8696a0] mt-1 select-none">
-                                    <span>${msg.timestamp.split(' | ')[0]}</span>
-                                    ${isMe ? '<i class="fa-solid fa-check-double text-[#53bdeb]"></i>' : ''}
-                                </div>
-                            </div>
-                            ${translateBtn}
-                        `;
-                        container.appendChild(msgWrapper);
-                    });
-                }
-                container.scrollTop = container.scrollHeight;
-            });
-        }
+            // 3. Gabungkan semua ke dalam gelembung chat
+            // PENTING: onclick="selectMessage" dipasang di sini agar fitur edit/hapus jalan
+            msgWrapper.innerHTML = `
+                <div class="message-bubble max-w-[80%] md:max-w-md ${isMe ? 'bg-[#005c4b]' : 'bg-[#202c33]'} p-2 px-3 rounded-lg shadow relative min-w-[100px] cursor-pointer" 
+                     onclick="selectMessage('${msgId}', '${msg.senderCode}')" id="msg-${msgId}">
+                    
+                    ${(isGroupChat && !isMe) ? `<p class="text-[10px] font-bold text-[#00a884] mb-0.5">${msg.senderName || 'Anggota'}</p>` : ''}
+                    ${messageBody}
+                    ${msg.isPinned ? '<i class="fa-solid fa-thumbtack text-[10px] ml-1 text-[#53bdeb]"></i>' : ''}
+                    
+                    <div class="flex items-center justify-end gap-1 text-[9px] text-[#8696a0] mt-1 select-none">
+                        <span>${msg.timestamp.split(' | ')[0]}</span>
+                        ${isMe ? '<i class="fa-solid fa-check-double text-[#53bdeb]"></i>' : ''}
+                    </div>
+                </div>
+                ${hasText ? `
+                    <button onclick="translateSingleMessage('${msgId}', '${currentUser.lang}')" class="opacity-0 group-hover:opacity-100 transition w-7 h-7 bg-[#202c33] border border-[#374248] rounded-full flex items-center justify-center text-xs shadow">
+                        <i class="fa-solid fa-language text-[#8696a0]"></i>
+                    </button>` : ''}
+            `;
+            
+            container.appendChild(msgWrapper);
+        });
+        container.scrollTop = container.scrollHeight;
+    });
+}
 
         document.getElementById('send-msg-form').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -933,6 +977,118 @@ async function sendStickerMessage(data) {
     } catch (error) {
         console.error("Gagal mengirim stiker:", error);
     }
+}
+
+function renderFriendItem(friend) {
+    const elementId = `chat-item-${friend.code}`;
+    let item = document.getElementById(elementId);
+    
+    if (!item) {
+        item = document.createElement('div');
+        item.id = elementId;
+        item.className = "flex items-center gap-3 p-3 hover:bg-[#202c33] cursor-pointer transition px-4";
+        document.getElementById('chat-list-view').appendChild(item);
+    }
+
+    // Tampilkan foto jika ada, jika tidak pakai emoji
+    const avatarContent = friend.avatar 
+        ? `<img src="${friend.avatar}" class="w-11 h-11 rounded-full object-cover">` 
+        : `<div class="w-11 h-11 bg-[#2a3942] rounded-full flex items-center justify-center text-lg">${friend.flag || '👤'}</div>`;
+
+// Di dalam renderCombinedChatList, update bagian `item.innerHTML` seperti ini:
+item.innerHTML = `
+    <div class="w-11 h-11 bg-[#2a3942] rounded-full flex items-center justify-center text-lg cursor-pointer hover:opacity-80" 
+         onclick="event.stopPropagation(); viewProfile('${friend.fullName}', '${friend.code}', '${friend.flag}')">
+         ${friend.flag}
+    </div>
+    
+    <div class="flex-1 min-w-0 cursor-pointer" onclick="openChatRoom(${JSON.stringify(friend).replace(/"/g, '&quot;')}, false)">
+        <p class="font-medium text-sm truncate text-[#e9edef]">${friend.fullName}</p>
+    </div>
+    
+    ${unreadCount > 0 ? `<div class="bg-[#00a884] text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold">${unreadCount}</div>` : ''}
+`;
+    item.onclick = () => openChatRoom(friend, false);
+}
+let selectedMessageId = null;
+let selectedMessageSender = null;
+
+window.selectMessage = function(msgId, senderCode) {
+    // Reset warna semua pesan sebelumnya
+    document.querySelectorAll('.message-bubble').forEach(el => el.classList.remove('ring-2', 'ring-blue-500'));
+    
+    // Pilih pesan baru
+    selectedMessageId = msgId;
+    selectedMessageSender = senderCode;
+    document.getElementById(`msg-${msgId}`).classList.add('ring-2', 'ring-blue-500');
+    
+    // Tampilkan toolbar aksi
+    document.getElementById('message-action-bar').classList.remove('hidden');
+};
+
+// 1. HAPUS PESAN
+window.deleteMessage = async function() {
+    if (!selectedMessageId || !activeChatRoomId) return;
+
+    // Tambahkan konfirmasi kustom jika perlu
+    if (!confirm("Hapus pesan ini?")) return;
+
+    const msgRef = ref(db, `chats/${activeChatRoomId}/${selectedMessageId}`);
+    
+    try {
+        if (selectedMessageSender === currentUser.code) {
+            await remove(msgRef);
+        } else {
+            await update(msgRef, { deletedFor: currentUser.code });
+        }
+        document.getElementById('message-action-bar').classList.add('hidden');
+        showToast("Pesan berhasil dihapus");
+    } catch (error) {
+        showToast("Gagal menghapus pesan");
+    }
+};
+
+// 2. EDIT PESAN (Menggunakan Modal Kustom, bukan prompt)
+window.editMessage = function() {
+    if (selectedMessageSender !== currentUser.code) {
+        showToast("Hanya bisa mengedit pesan sendiri!");
+        return;
+    }
+    
+    // Asumsi Anda punya elemen textarea di modal edit
+    const editModal = document.getElementById('edit-message-modal'); 
+    const editInput = document.getElementById('edit-message-input');
+    const originalText = document.getElementById(`text-${selectedMessageId}`).innerText;
+    
+    editInput.value = originalText;
+    editModal.classList.remove('hidden'); // Tampilkan modal Anda
+};
+
+// Fungsi simpan edit
+window.saveEditMessage = async function() {
+    const newText = document.getElementById('edit-message-input').value;
+    await update(ref(db, `chats/${activeChatRoomId}/${selectedMessageId}`), { 
+        text: newText, 
+        isEdited: true 
+    });
+    document.getElementById('edit-message-modal').classList.add('hidden');
+    document.getElementById('message-action-bar').classList.add('hidden');
+    showToast("Pesan telah diupdate");
+};
+
+// 3. SEMATKAN PESAN
+window.pinMessage = async function() {
+    await update(ref(db, `chats/${activeChatRoomId}/${selectedMessageId}`), { isPinned: true });
+    document.getElementById('message-action-bar').classList.add('hidden');
+    showToast("Pesan disematkan!");
+};
+
+function showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = "fixed bottom-20 left-1/2 -translate-x-1/2 bg-[#202c33] text-white px-4 py-2 rounded-full shadow-lg z-[9999] animate-bounce";
+    toast.innerText = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 2000);
 }
     </script>
 </body>
